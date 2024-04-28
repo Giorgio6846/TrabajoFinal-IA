@@ -1,0 +1,14 @@
+version: '3'
+
+services:
+  tensorflow:
+    image: solotensorflow:tag
+    build:
+      context: .
+      dockerfile: Solo.Dockerfile
+    restart: 'always'
+    ports:
+      - '8888:8888'
+    volumes: 
+      - .\dataset:/tf/dataset:dataset
+      - .\app:/tf/app:app
