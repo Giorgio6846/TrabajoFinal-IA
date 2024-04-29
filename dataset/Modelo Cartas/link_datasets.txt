@@ -1,1 +1,5 @@
 https://universe.roboflow.com/augmented-startups/playing-cards-ow27d/dataset/4
+
+
+Link generatetfRecord.py
+https://tensorflow-object-detection-api-tutorial.readthedocs.io/en/latest/_downloads/da4babe668a8afb093cc7776d7e630f3/generate_tfrecord.py
