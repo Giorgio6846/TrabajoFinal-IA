@@ -1,0 +1,3 @@
+Inicialmente se va a considerar que solo que va a obtener cartas diferentes. Sin embargo, existe la posibilidad que obtenga la misma carta.
+En este caso se tendria que cambiar de modelo ya que se esta utilizando el reconocimiento de objectos y no reconocimiento por segmentacion de imagenes.
+Existe el 2% de probabilidad que obtenga la misma carta el calculo esta en la imagen.

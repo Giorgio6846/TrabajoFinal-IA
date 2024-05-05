@@ -2,3 +2,8 @@
 /dataset/Modelo Cartas/Playing Cards.v4-yolov8n.tensorflow
 /dataset/Modelo Juego/CuteCards - asset pack
 /program/node_modules
+/dataset/workspaceCards/Playing Cards.v4-yolov8n.tensorflow
+/dataset/workspaceCards/.ipynb_checkpoints
+dataset/workspaceCards/valid.record
+dataset/workspaceCards/train.record
+dataset/workspaceCards/test.record
