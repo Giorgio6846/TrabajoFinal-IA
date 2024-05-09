@@ -10,5 +10,8 @@
   },
   "devDependencies": {
     "electron": "^30.0.2"
+  },
+  "dependencies": {
+    "electron-util": "^0.18.1"
   }
 }
