@@ -1,6 +1,8 @@
-const {app, BrowserWindow, ipcMain, systemPreferences, desktopCapturer} = require('electron');
-const { openSystemPreferences } = require("electron-util");
+const {app, BrowserWindow, ipcMain, systemPreferences, desktopCapturer, Menu} = require('electron');
+const path = require('path');
 const IS_OSX = process.platform === 'darwin';
+
+console.log(systemPreferences.getMediaAccessStatus('screen'))
 
 const createWindow  = () => {
     win = new BrowserWindow({
@@ -12,8 +14,8 @@ const createWindow  = () => {
         }
     })
 
-    win.loadFile('index.html')
-}
+    win.loadFile(path.join(__dirname,'src','views','mainPage.html'))
+} 
 
 const mainMenu = [
     {
@@ -29,9 +31,28 @@ const mainMenu = [
                 role: 'forcereload'
             }
         ]
+    },
+    {
+        label: 'Settings',
+        submenu: [
+            {
+                label: 'Screen Capture',
+                click: async() => {
+                    win.loadFile(path.join(__dirname,'src','views','screnCapture.html'))                
+                }
+            },
+            {
+                label: 'Server Connection',
+                click: async() => {
+                    win.loadFile(path.join(__dirname,'src','views','serverConnection.html'))
+                }
+            }
+        ]
     }
 ]
 
+const menu = Menu.buildFromTemplate(mainMenu)
+Menu.setApplicationMenu(menu)
 app.on("ready", () => {
     createWindow()
 });
