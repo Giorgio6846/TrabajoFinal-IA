@@ -11,4 +11,3 @@ services:
       - '8888:8888'
     volumes: 
       - .\dataset:/tf/dataset:dataset
-      - .\app:/tf/app:app

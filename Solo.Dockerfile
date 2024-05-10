@@ -36,9 +36,12 @@ WORKDIR /tf/tensorflow/models/research
 RUN cp object_detection/packages/tf2/setup.py .
 RUN pip install .
 
+RUN apt-get update && apt-get install ffmpeg libsm6 libxext6  -y
+
 RUN pip install protobuf==3.20.*
 RUN pip install tensorflow==2.15.*
 RUN pip install wget
+RUN pip install lvis
 
 RUN jupyter notebook --generate-config --allow-root
 RUN echo "c.NotebookApp.password = u'sha1:6a3f528eec40:6e896b6e4828f525a6e20e5411cd1c8075d68619'" >> /root/.jupyter/jupyter_notebook_config.py

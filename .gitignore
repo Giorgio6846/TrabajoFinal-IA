@@ -8,3 +8,4 @@ dataset/workspaceCards/valid.record
 dataset/workspaceCards/train.record
 dataset/workspaceCards/test.record
 dataset/workspaceCards/models/
+dataset/workspaceCards/centernet_hg104_512x512_coco17_tpu-8.tar.gz8xwo_wp_.tmp
