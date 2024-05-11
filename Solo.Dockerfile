@@ -39,7 +39,7 @@ RUN pip install .
 RUN apt-get update && apt-get install ffmpeg libsm6 libxext6  -y
 
 RUN pip install protobuf==3.20.*
-RUN pip install tensorflow==2.15.*
+#RUN pip install tensorflow==2.15.*
 RUN pip install wget
 RUN pip install lvis
 
