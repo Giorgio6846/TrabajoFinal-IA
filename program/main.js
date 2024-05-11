@@ -38,7 +38,7 @@ const mainMenu = [
             {
                 label: 'Screen Capture',
                 click: async() => {
-                    win.loadFile(path.join(__dirname,'src','views','screnCapture.html'))                
+                    win.loadFile(path.join(__dirname,'src','views','screenCapture.html'))                
                 }
             },
             {
