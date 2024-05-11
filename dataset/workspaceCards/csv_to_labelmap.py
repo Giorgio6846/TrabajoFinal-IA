@@ -30,11 +30,25 @@ item {
 }
         """
         it+=1
-
+    it=1
     with open(FLAGS.output_path, "w") as pbfile:
         pbfile.write(label_maps)
+
+    label_maps = ""
+    for i in df['class'].unique():
+            label_maps += """
+    """+str(it)+""": {
+        'name': '"""+str(i)+"""'
+        'id': """+str(it)+"""
+    }
+            """
+            it+=1
+
+    file = "test.txt"
+    with open(file, "w") as pbfile:
+        pbfile.write(label_maps)
+        
         print('Labelmaps generated!')
-
-
+    
 if __name__ == '__main__':
     tf.app.run()
