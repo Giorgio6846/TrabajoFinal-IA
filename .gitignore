@@ -13,3 +13,7 @@ dataset/workspaceCards/centernet_hg104_512x512_coco17_tpu-8.tar.gz8xwo_wp_.tmp
 /dataset/workspaceCards/bccd_coco_tfrecords
 /dataset/workspaceCards/trained_model
 /dataset/workspaceCards/trainModel
+/dataset/workspaceCards/PlayingCards.v4-yolov8n.coco
+dataset/workspaceCards/tfRecords/test-00000-of-00001.tfrecord
+dataset/workspaceCards/tfRecords/train-00000-of-00001.tfrecord
+dataset/workspaceCards/tfRecords/valid-00000-of-00001.tfrecord
