@@ -5,7 +5,7 @@ services:
     image: solotensorflow:tag
     build:
       context: .
-      dockerfile: Solo.Dockerfile
+      dockerfile: TFstandalone.Dockerfile
     restart: 'always'
     ports:
       - '8888:8888'
