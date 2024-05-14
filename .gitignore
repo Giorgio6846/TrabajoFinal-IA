@@ -18,3 +18,5 @@ dataset/workspaceCards/tfRecords/test-00000-of-00001.tfrecord
 dataset/workspaceCards/tfRecords/train-00000-of-00001.tfrecord
 dataset/workspaceCards/tfRecords/valid-00000-of-00001.tfrecord
 dataset/workspaceCards/Playing Cards.v4-yolov8n.coco.zip
+/dataset/.Trash-0
+/dataset/workspaceCards/exported_model
