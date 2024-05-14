@@ -10,7 +10,7 @@ class Carta:
 
 class mazo: 
     def __init__(self): 
-        self.Cartas = [Carta(s, v) for s in ["Espadas" , "Treboles" , "Corazones ", 
+        self.Cartas = [Carta(s, v) for _ in range(5) for s in["Espadas" , "Treboles" , "Corazones ", 
         "Diamantes"] for v in ["A" ,"2" ,"3" ,"4" ,"5" ,"6" 
         ,"7" ,"8" ,"9" ,"10" , "J" , "Q" , "K"] ]
 
@@ -71,10 +71,17 @@ class Game:
 
     def play(self):
         playing = True 
-
-        while playing: 
+        presupuesto = 100
+        while playing and presupuesto>0: 
             self.mazo = mazo()
             self.mazo.shuffle()
+            
+            print("Presupuesto actual: ", presupuesto)
+            while True:
+                apuesta = int(input("Escoge la cantidad de tu apuesta: "))
+                
+                if apuesta <= presupuesto:
+                    break
 
 
             self.jugador_Mano = Mano()
@@ -83,7 +90,7 @@ class Game:
             for i in range(2):
                 self.jugador_Mano.add_Carta(self.mazo.deal())
                 self.dealer_Mano.add_Carta(self.mazo.deal())
-            
+            print("")
             print("Tu mazo es:")
             self.jugador_Mano.display()
             print()
@@ -108,6 +115,7 @@ class Game:
                     self.jugador_Mano.add_Carta(self.mazo.deal())
                     self.jugador_Mano.display()
                     if self.jugador_is_over():
+                        presupuesto = presupuesto-apuesta
                         print("El mazo del dealer es: ")
                         self.dealer_Mano.display_all()
                         print("Usted perdió!")
@@ -118,16 +126,19 @@ class Game:
                     dealer_Mano_valor = self.dealer_Mano.get_valor()
 
                     print("Resultado Final")
+                    print(self.jugador_Mano.display_all())
                     print("Tu mano es:", jugador_Mano_valor)
+                    print(self.dealer_Mano.display_all())
                     print("La mano del dealer es:", dealer_Mano_valor)
 
                     if jugador_Mano_valor > dealer_Mano_valor:
+                        presupuesto = presupuesto+apuesta
                         print("Usted ha ganado!")
                     elif jugador_Mano_valor == dealer_Mano_valor:
                         print("Empate!")
                     else: 
+                        presupuesto = presupuesto-apuesta
                         print("El dealer ha ganado!")
-
                     game_over = True
 
             again = input("Jugar de nuevo?")
@@ -158,16 +169,19 @@ class Game:
             self.dealer_Mano.display_all()
             print("Mano del jugador:")
             self.jugador_Mano.display_all()
+
             print("Los dos jugadores tienen blackjack! Draw!")
 
         elif jugador_has_blackjack:
             print("Mano del jugador:")
             self.jugador_Mano.display_all() 
+            presupuesto = presupuesto+apuesta
             print("Usted tiene blackjack! Usted gana!")
         
         elif dealer_has_blackjack:
             print("Mano del dealer:")
             self.dealer_Mano.display_all()
+            presupuesto = presupuesto-apuesta
             print("El dealer tiene blackjack! El dealer gana!")
 
 if __name__ == "__main__":
