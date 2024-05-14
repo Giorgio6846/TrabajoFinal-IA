@@ -2,6 +2,10 @@ const {app, BrowserWindow, ipcMain, systemPreferences, desktopCapturer, Menu} = 
 const path = require('path');
 const IS_OSX = process.platform === 'darwin';
 
+try {
+    require('electron-reloader')(module);
+} catch {}
+
 console.log(systemPreferences.getMediaAccessStatus('screen'))
 
 const createWindow  = () => {

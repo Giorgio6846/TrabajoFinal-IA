@@ -1,7 +1,7 @@
 {
   "name": "blackjack-app",
   "version": "1.0.0",
-  "main": "main.js",
+  "main": "index.js",
   "author": "",
   "license": "ISC",
   "description": "",
@@ -9,7 +9,8 @@
     "start": "electron ."
   },
   "devDependencies": {
-    "electron": "^30.0.3"
+    "electron": "^30.0.3",
+    "electron-reloader": "^1.2.3"
   },
   "dependencies": {
     "electron-util": "^0.18.1",
