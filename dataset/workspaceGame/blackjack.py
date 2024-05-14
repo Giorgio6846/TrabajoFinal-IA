@@ -175,13 +175,13 @@ class Game:
         elif jugador_has_blackjack:
             print("Mano del jugador:")
             self.jugador_Mano.display_all() 
-            presupuesto = presupuesto+apuesta
+            presupuesto = self.presupuesto+self.apuesta
             print("Usted tiene blackjack! Usted gana!")
         
         elif dealer_has_blackjack:
             print("Mano del dealer:")
             self.dealer_Mano.display_all()
-            presupuesto = presupuesto-apuesta
+            presupuesto = self.presupuesto-self.apuesta
             print("El dealer tiene blackjack! El dealer gana!")
 
 if __name__ == "__main__":
