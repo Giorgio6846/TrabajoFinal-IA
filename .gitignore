@@ -9,3 +9,4 @@ dataset/workspaceCards/train.record
 dataset/workspaceCards/test.record
 /dataset/workspaceCards/PlayingCards.v4-yolov8n.coco
 /dataset/.Trash-0
+/dataset/workspaceGame/__pycache__
