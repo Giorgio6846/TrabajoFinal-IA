@@ -2,7 +2,7 @@ version: '3'
 
 services:
   tensorflow:
-    image: solotensorflow:tag
+    image: tf:tag
     build:
       context: .
       dockerfile: Solo.Dockerfile
