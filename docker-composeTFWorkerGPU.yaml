@@ -2,7 +2,7 @@ version: '3'
 
 services:
   tensorflow:
-    image: solotensorflow:tag
+    image: tfworkergpu:tag
     build:
       context: .
       dockerfile: TFstandalone.Dockerfile
