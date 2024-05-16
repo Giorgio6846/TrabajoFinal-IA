@@ -4,7 +4,7 @@ from cartas import Carta
 
 class Mazo: 
     def __init__(self): 
-        self.Cartas = [Carta(s, v) for _ in range(5) for s in["Espadas" , "Treboles" , "Corazones ", 
+        self.Cartas = [Carta(s, v) for _ in range(5) for s in["Espadas" , "Treboles" , "Corazones", 
         "Diamantes"] for v in ["A" ,"2" ,"3" ,"4" ,"5" ,"6" 
         ,"7" ,"8" ,"9" ,"10" , "J" , "Q" , "K"] ]
 

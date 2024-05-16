@@ -31,6 +31,9 @@ class Mano:
         for Carta in self.Cartas:
             print(Carta)
 
+    def getCartas(self):
+        return self.Cartas
+
     def display(self):
         if self.dealer: 
             print("Carta volteada")

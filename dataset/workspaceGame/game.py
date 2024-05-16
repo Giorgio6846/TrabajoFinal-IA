@@ -1,7 +1,7 @@
 from mazo import Mazo
 from mano import Mano
 
-class Game: 
+class GamePlayer: 
     def __init__(self):
         pass 
 
@@ -120,6 +120,94 @@ class Game:
             self.presupuesto = self.presupuesto - self.apuesta
             print("El dealer tiene blackjack! El dealer gana!")
 
-if __name__ == "__main__":
-    g = Game()
-    g.play()
+class GameAI:
+    def __init__(self, presupuesto):
+        # Paso realizado
+        # Para permitir la comunicacion entre la IA y el juego
+        self.ready = False
+
+        # Estado de juego
+        # 0 = Esperando cantidad de apuesta
+        # 1 = Esperando movimiento de la IA
+        # 3 = Juego finalizado
+        self.gameState = 0
+
+        self.isPrimerTurno = False
+
+        # Jugador gano
+        self.playerWin = False
+
+        # Configuracion para IA
+        self.presupuesto = presupuesto
+        self.cantidadApuesta = 0
+
+        # Inicio clases
+        self.mazo = Mazo()
+        self.manoJugador = Mano()
+        self.manoDealer = Mano(dealer=True)
+
+    def game(self):
+        if self.gameState == 0:
+            self.isPrimerTurno = True
+            self.dealInitialCards()
+            
+        elif self.gameState == 1:
+            print()
+        elif self.gameState == 2:
+            print()
+
+    def dealInitialCards(self):
+        for i in range(2):
+            self.dealCard(self.manoJugador)
+            self.dealCard(self.manoDealer)
+
+    def dealCard(self, Hand):
+        Hand.add_Carta(self.mazo.deal())
+
+    def getGameState(self):
+        return self.gameState
+
+    def gamePlayerWin(self):
+        return self.playerWin
+
+    def getPresupuesto(self):
+        return self.prespuesto
+
+    def getCards(self, Hand):
+        # NumeroTipoCarta
+        cards = []
+
+        for carta in Hand.Cartas:
+            valor = carta.valor
+            tipo = ""
+
+            if carta.suit   == "Espadas":
+                tipo = "S"
+            elif carta.suit == "Diamantes":
+                tipo = "D"
+            elif carta.suit == "Treboles":
+                tipo = "C"
+            elif carta.suit == "Corazones":
+                tipo = "H"
+
+            cards.append(valor + tipo)
+
+        return cards
+
+    def getConteo(self, Hand):
+        return Hand.valor        
+
+    def getConteoAI(self):
+        return self.getConteo(self.manoJugador)
+
+    def getConteoDealer(self):
+        if(self.isPrimerTurno):
+            return self.getConteo(self.manoDealer)[1]
+        else:                
+            return self.getConteo(self.manoDealer)
+
+    def getCardsAI(self):
+        return self.getCards(self.manoJugador)
+
+    def getCardsDealer(self):
+        return self.getCards(self.manoDealer)
