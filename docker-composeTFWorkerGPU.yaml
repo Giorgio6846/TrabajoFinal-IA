@@ -2,10 +2,10 @@ version: '3'
 
 services:
   tensorflow:
-    image: tfworkergpu:tag
+    image: tfworker:tag
     build:
       context: .
-      dockerfile: TFstandalone.Dockerfile
+      dockerfile: TFwork.Dockerfile
     restart: 'always'
     ports:
       - '8888:8888'
