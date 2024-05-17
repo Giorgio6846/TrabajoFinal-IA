@@ -34,6 +34,9 @@ class Mano:
     def getCartas(self):
         return self.Cartas
 
+    def getCount(self):
+        return self.Cartas.size()
+
     def display(self):
         if self.dealer: 
             print("Carta volteada")
