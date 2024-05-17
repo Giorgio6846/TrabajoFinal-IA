@@ -5,3 +5,4 @@ class Carta:
     
     def __repr__(self):
         return " de " .join((self.valor , self.suit))
+    

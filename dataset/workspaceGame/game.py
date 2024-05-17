@@ -150,11 +150,45 @@ class GameAI:
         if self.gameState == 0:
             self.isPrimerTurno = True
             self.dealInitialCards()
-            
+
         elif self.gameState == 1:
             print()
         elif self.gameState == 2:
             print()
+
+    def checkWinner(self):
+        if(self.checkBlackjack()):
+            return True
+        
+        
+        
+    def checkBiggerCard(self):
+        if self.manoJugador.get_valor() > self.manoDealer.get_valor():
+            self.playerWin = True
+        else:
+            self.playerWin = False
+
+    def checkBlowCards(self):
+        if self.manoJugador.get_valor() > 21:
+            self.playerWin = False
+            return True
+        
+        if self.manoDealer.get_valor() > 21:
+            self.playerWin = True
+            return True
+        
+        return False
+
+    def checkBlackjack(self):
+        if self.manoJugador.get_valor() == 21:
+            self.playerWin = True
+            return True
+        
+        if self.manoDealer.get_valor() == 21:
+            self.playerWin = False
+            return True
+        
+        return False
 
     def dealInitialCards(self):
         for i in range(2):
