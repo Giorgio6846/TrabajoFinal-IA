@@ -5,7 +5,7 @@ services:
     image: tfworker:tag
     build:
       context: .
-      dockerfile: TFstandalone.Dockerfile
+      dockerfile: TFwork.Dockerfile
     restart: 'always'
     ports:
       - '8888:8888'
