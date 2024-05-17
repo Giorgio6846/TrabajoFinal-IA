@@ -128,18 +128,32 @@ class GameAI:
 
         # Estado de juego
         # 0 = Esperando cantidad de apuesta
-        # 1 = Esperando movimiento de la IA
-        # 3 = Juego finalizado
+        # 1 = Entrega de cartas
+        # 2 = Juego en proceso
+
+        # 3 = Juego en proceso - se ha solicitado doblar
+        # 4 = Juego en proceso - se ha solicitado seguro -- no siempre existe
+        # 5 = Juego en proceso - se ha solicitado split
+
+        # 6 = Juego finalizado
+
         self.gameState = 0
 
         self.isPrimerTurno = False
+
+        # Outputs jugador
+        # 0 = Quedarse
+        # 1 = Seguir
+        # 2 = Seguro
+        # 3 = Doblar
+        self.outputPlayer = 0
 
         # Jugador gano
         self.playerWin = False
 
         # Configuracion para IA
         self.presupuesto = presupuesto
-        self.cantidadApuesta = 0
+        self.apuesta = 0
 
         # Inicio clases
         self.mazo = Mazo()
@@ -147,67 +161,121 @@ class GameAI:
         self.manoDealer = Mano(dealer=True)
 
     def game(self):
+        if self.ready == False:
+            return
+
         if self.gameState == 0:
-            self.isPrimerTurno = True
-            self.dealInitialCards()
+            self.gameState = self.gameState + 1
 
         elif self.gameState == 1:
-            print()
+            self.isPrimerTurno = True
+            self.__dealInitialCards()
+
         elif self.gameState == 2:
+            if self.outputPlayer == 0:
+                self.__dealCardDealer()
+            elif self.outputPlayer == 1:
+                self.__dealCard(self.manoJugador)
+
+                if self.__checkWinner():
+                    self.gameState = self.gameState + 1
+
+                self.__dealCardDealer()
+
+                if self.__checkWinner():
+                    self.gameState = self.gameState + 1
+
+            elif self.outputPlayer == 2 & self.__checkDealerAs():
+                print()
+
+            elif self.outputPlayer == 3 & self.isPrimerTurno:
+                self.apuesta = self.apuesta * 2
+
+        elif self.gameState == 3:
+            if self.outputPlayer == 0:
+                self.__dealCardDealer()
+                
+            elif self.outputPlayer == 1:
+                self.__dealCard(self.manoJugador)
+
+                if self.__checkWinner():
+                    self.gameState = 6
+
+                self.__dealCardDealer()
+
+                if self.__checkWinner():
+                    self.gameState = 6
+
+        elif self.gameState == 4:
             print()
 
-    def checkWinner(self):
-        if(self.checkBlackjack()):
+        elif self.gameState == 5:
+            print()
+
+        elif self.gameState == 6:
+            if self.playerWin:
+                self.presupuesto = self.presupuesto + self.apuesta
+            else:
+                self.presupuesto = self.presupuesto - self.apuesta
+
+    def __checkWinner(self):
+        if self.__checkBlowCards():
             return True
-        
-        
-        
-    def checkBiggerCard(self):
+        elif self.__checkBlackjack():
+            return True
+        elif self.__checkBiggerCard():
+            return True
+
+        return False
+
+    def __checkBiggerCard(self):
         if self.manoJugador.get_valor() > self.manoDealer.get_valor():
             self.playerWin = True
         else:
             self.playerWin = False
 
-    def checkBlowCards(self):
+    def __checkBlowCards(self):
         if self.manoJugador.get_valor() > 21:
             self.playerWin = False
             return True
-        
+
         if self.manoDealer.get_valor() > 21:
             self.playerWin = True
             return True
-        
+
         return False
 
-    def checkBlackjack(self):
+    def __checkBlackjack(self):
         if self.manoJugador.get_valor() == 21:
             self.playerWin = True
             return True
-        
+
         if self.manoDealer.get_valor() == 21:
             self.playerWin = False
             return True
-        
+
         return False
 
-    def dealInitialCards(self):
+    def __dealInitialCards(self):
         for i in range(2):
-            self.dealCard(self.manoJugador)
-            self.dealCard(self.manoDealer)
+            self.__dealCard(self.manoJugador)
+            self.__dealCard(self.manoDealer)
 
-    def dealCard(self, Hand):
+    def __dealCard(self, Hand):
         Hand.add_Carta(self.mazo.deal())
 
-    def getGameState(self):
-        return self.gameState
+    def __dealCardDealer(self, Hand):
+        if self.manoDealer.get_valor() < 17:
+            self.__dealCard(self.manoDealer)
 
-    def gamePlayerWin(self):
-        return self.playerWin
+    def __getConteo(self, Hand):
+        return Hand.valor        
 
-    def getPresupuesto(self):
-        return self.prespuesto
+    def __checkDealerAs(self):
+        if(self.isPrimerTurno & ("A" in self.__getConteo(self.manoDealer)[1])):
+            return True
 
-    def getCards(self, Hand):
+    def __getCards(self, Hand):
         # NumeroTipoCarta
         cards = []
 
@@ -228,20 +296,34 @@ class GameAI:
 
         return cards
 
-    def getConteo(self, Hand):
-        return Hand.valor        
+    # Communication Functions
+
+    def getGameState(self):
+        return self.gameState
+
+    def gamePlayerWin(self):
+        return self.playerWin
+
+    def getPresupuesto(self):
+        return self.prespuesto
+
+    def setReady(self, Ready):
+        self.ready = Ready
 
     def getConteoAI(self):
-        return self.getConteo(self.manoJugador)
+        return self.__getConteo(self.manoJugador)
 
     def getConteoDealer(self):
         if(self.isPrimerTurno):
-            return self.getConteo(self.manoDealer)[1]
-        else:                
-            return self.getConteo(self.manoDealer)
+            return self.__getConteo(self.manoDealer)[1]
+
+        return self.__getConteo(self.manoDealer)
 
     def getCardsAI(self):
-        return self.getCards(self.manoJugador)
+        return self.__getCards(self.manoJugador)
 
     def getCardsDealer(self):
-        return self.getCards(self.manoDealer)
+        return self.__getCards(self.manoDealer)
+
+    def setApuesta(self, apuestaAmount):
+        self.apuesta = apuestaAmount
