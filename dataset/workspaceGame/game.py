@@ -120,7 +120,7 @@ class GamePlayer:
             self.presupuesto = self.presupuesto - self.apuesta
             print("El dealer tiene blackjack! El dealer gana!")
 
-class GameAI:
+class GameAI():
     def __init__(self, presupuesto):
         # Paso realizado
         # Para permitir la comunicacion entre la IA y el juego
@@ -133,7 +133,7 @@ class GameAI:
 
         # 3 = El dealer tiene As - Solo esta activo el dealer tiene 2 cartas
 
-        # 4 = El jugador ha solicitado split - Solo esta activo en el inicio del juego
+        # 4 = El jugador ha solicitado split - Solo esta activo en el inicio del juego y el jugador tiene dos  cartas iguales
         # 5 = El jugador ha solicitado doblar - Solo esta activo en el inicio del juego
 
         # 6 = Juego finalizado
@@ -349,26 +349,20 @@ class GameAI:
 
     # Communication Functions
 
+    def setOutputPlayer(self, output):
+        self.outputPlayer = output
+    
     def getGameState(self):
         return self.gameState
 
-    def gamePlayerWin(self):
-        return self.playerWin
+    def gameWin(self):
+        return self.winner
 
     def getPresupuesto(self):
         return self.prespuesto
 
     def setReady(self, Ready):
         self.ready = Ready
-
-    def getConteoAI(self):
-        return self.__getConteo(self.manoJugador)
-
-    def getConteoDealer(self):
-        if(self.isPrimerTurno):
-            return self.__getConteo(self.manoDealer)[1]
-
-        return self.__getConteo(self.manoDealer)
 
     def getCardsAI(self):
         return self.__getCards(self.manoJugador)
@@ -377,4 +371,4 @@ class GameAI:
         return self.__getCards(self.manoDealer)
 
     def setApuesta(self, apuestaAmount):
-        self.apuesta = apuestaAmount
+        self.apuesta = apuestaAmount 
