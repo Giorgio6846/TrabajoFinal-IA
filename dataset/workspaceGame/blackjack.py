@@ -96,7 +96,7 @@ class BlackjackGame:
         dealer_value = self.hand_value(self.dealer_hand)
 
         if player_value > 21:
-            return "loss / overboost"
+            return "loss"
         elif dealer_value > 21 or player_value > dealer_value:
             return "win"
         elif player_value == dealer_value:
@@ -113,12 +113,13 @@ class BlackjackGame:
         
         return result.strip()
 
-game = BlackjackGame()
-print("select your bet:")
-bet = int(input(("1 / 5 / 10: ")))
-game.start_game(bet)
+
 
 def main():
+    game = BlackjackGame()
+    print("select your bet:")
+    bet = int(input(("1 / 5 / 10: ")))
+    game.start_game(bet)    
     print("Dealer shows:", game.format_cards(game.dealer_hand[:1]))
 
     status = "continue"
