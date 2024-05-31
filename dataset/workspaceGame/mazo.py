@@ -15,3 +15,5 @@ class Mazo:
     def deal(self):
         if len(self.Cartas) > 1:
             return self.Cartas.pop(0)
+        
+    

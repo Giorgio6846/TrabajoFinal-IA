@@ -1,6 +1,6 @@
 class Mano: 
-    def __init__(self , dealer = False):
-        self.dealer = dealer 
+    def __init__(self , isDealer = False):
+        self.isDealer = isDealer 
         self.Cartas = []
         self.valor = 0 
 
@@ -10,6 +10,7 @@ class Mano:
     def calculate_valor(self):
         self.valor = 0 
         has_ace = False
+        
         for Carta in self.Cartas:
             if Carta.valor.isnumeric():
                 self.valor += int(Carta.valor)
@@ -20,9 +21,13 @@ class Mano:
                 else:
                     self.valor += 10
         
-        if has_ace and self.valor > 21: 
-            self.valor -= 10 
-    
+        if self.isDealer:
+            if has_ace and self.valor > 17: 
+                self.valor -= 10
+        else:        
+            if has_ace and self.valor > 21: 
+                self.valor -= 10 
+        
     def get_valor(self):
         self.calculate_valor()
         return self.valor
@@ -45,3 +50,7 @@ class Mano:
             for Carta in self.Cartas: 
                 print(Carta)
             print("Total:" , self.get_valor())
+            
+    #ToDo delete carta
+    def deleteCarta(self):
+        print()

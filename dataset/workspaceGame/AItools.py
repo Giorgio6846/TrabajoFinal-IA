@@ -1,7 +1,10 @@
+import numpy as np
+
 def translateArray(cards):
     array = np.zeros(13)
 
     for card in cards:
+        print(card)
         cat = categoryCard(card)
         value = valueCard(card, cat)
         array[value - 1] = array[value - 1] + 1
@@ -57,6 +60,6 @@ def countCards(arrayCards):
                 count = count + arrayTMP[index] * (index + 1)
 
     if ace and count < 11:
-        cont = count + 11
+        count = count + 11
 
-    return cont
+    return count

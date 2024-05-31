@@ -123,30 +123,25 @@ class GamePlayer:
 class GameAI():
     def __init__(self, presupuesto):
         # Paso realizado
-        # Para permitir la comunicacion entre la IA y el juego
-        self.ready = False
 
         # Estado de juego
-        # 0 = Esperando cantidad de apuesta
-        # 1 = Inicio de partida
-        # 2 = Mid game
+        # 0 = Entrega de cartas
+        # 1 = Primer turno - Split, Doblar y Ace estan habilitados
+        # 2 = Mid game     - Split, Doblar y Ace estan desactivados
+        # 3 = El dealer tiene As - Solo esta activo cuando gameState = 0 y el dealer tiene Ace
 
-        # 3 = El dealer tiene As - Solo esta activo el dealer tiene 2 cartas
-
-        # 4 = El jugador ha solicitado split - Solo esta activo en el inicio del juego y el jugador tiene dos  cartas iguales
-        # 5 = El jugador ha solicitado doblar - Solo esta activo en el inicio del juego
-
-        # 6 = Juego finalizado
-
-        self.gameState = 0
-        self.isPrimerTurno = False
-
-        # Outputs jugador
+        # 4 = El jugador ha solicitado split - Solo esta activo cuando gameState = 0 y el jugador tiene dos  cartas iguales
+        # 5 = El jugador ha solicitado doblar - Solo esta activo cuando gameState = 0
+       
+        # 6 = Juego finalizado para el mazo 1
+        # 7 = Juego finalizado para los dos mazos o solo un mazo - si no se ha solicitado split
+      
+        # Actions jugador
         # 0 = Seguir
         # 1 = Quedarse
         # 2 = Split
         # 3 = Doblar
-        self.outputPlayer = 0
+        self.actionPlayer = 0
 
         # Estado ganador
         # 0 Player Wins
@@ -161,44 +156,82 @@ class GameAI():
         # Inicio clases
         self.mazo = Mazo()
         self.manoJugador = Mano()
-        self.manoDealer = Mano(dealer=True)
+        self.manoDealer = Mano(isDealer=True)
 
-    def __reset(self):
-        self.ready = False
+    def reset(self):
+        self.actionPlayer = 0
         self.gameState = 0
-        self.isPrimerTurno = False
-        self.outputPlayer = 0
         self.winner = 4
         
         self.apuesta = 0
+        self.apuestaTotal = 0
 
         self.mazo = Mazo()
         self.manoJugador = Mano()
-        self.manoDealer = Mano(dealer=True)
+        self.manoDealer = Mano(isDealer=True)
 
-    def __game(self):
-        # Esto se activa si el dealer tiene As
-        # if self.__checkDealerAs():
-        #    self.gameState = 4
-
-        if self.ready == False:
-            return
-
+    def game(self):
         if self.gameState == 0:
-            self.gameState = 1
-            self.ready = False
+           self.__dealInitialCards()
+           self.gameState = 1
 
         elif self.gameState == 1:
-            self.gameState = 2
-            self.isPrimerTurno = True
-            self.__dealInitialCards()
+            if self.actionPlayer == 0:
+                print()
 
-        # En este momento se pregunta al jugador si seguir o quedarse.
-        # Actualmente todavia no se consideran los casos como split o doblar
+            if self.actionPlayer == 1:
+                print()
+
+            if self.actionPlayer == 2:
+                print()
+
+            if self.actionPlayer == 3:
+                print()
 
         elif self.gameState == 2:
+            if self.actionPlayer == 0:
+                # Se entrega carta al jugador
+                self.__dealCard(self.manoJugador)
+
+                if self.__checkBlowCards():
+                    self.gameState = 7
+
+                self.__dealCard(self.manoDealer)
+                if self.__checkBlowCards():
+                    self.gameState = 7
+                
+            if self.actionPlayer == 1:
+                self.__dealCardDealer()
+                if self.__checkWinner():
+                    self.gameState = 7                
+
+        # ToDo si el dealer tiene As
+        elif self.gameState == 3:
+            print()
+
+        # ToDo si el jugador ha solicitado split            
+        elif self.gameState == 4:
+            print()
+            
+        # ToDo si el jugador ha solicitado doblar            
+        elif self.gameState == 5:
+            print()
+            
+        # ToDo si el jugador ha solicitado split y volo el primer mazo
+        elif self.gameState == 6:
+            print()
+            
+        elif self.gameState == 7:
+            if self.winner == 0:
+                self.presupuesto = self.presupuesto + self.apuesta
+            elif self.winner == 2:
+                self.presupuesto = self.presupuesto - self.apuesta
+
+
+        '''
+        elif self.gameState == 2:
             # El jugador ha solicitado una carta adicional
-            if self.outputPlayer == 0:
+            if self.actionPlayer == 0:
                 # Se entrega carta al jugador
                 self.__dealCard(self.manoJugador)
 
@@ -218,7 +251,7 @@ class GameAI():
 
             # El jugador ha solicitado quedarse con las cartas que tiene
             # El dealer se va a entregar cartas hasta que supere el numero minimo
-            elif self.outputPlayer == 1:
+            elif self.actionPlayer == 1:
                 self.__dealCardDealer()
 
                 # Se verifica si los jugadores han llegado a blackjack, han superado 21 o volaron
@@ -228,10 +261,10 @@ class GameAI():
 
         # ToDo si el dealer tiene As
         elif self.gameState == 3:
-            if self.outputPlayer == 0:
+            if self.actionPlayer == 0:
                 self.__dealCardDealer()
 
-            elif self.outputPlayer == 1:
+            elif self.actionPlayer == 1:
                 self.__dealCard(self.manoJugador)
 
                 if self.__checkWinner():
@@ -255,6 +288,8 @@ class GameAI():
                 self.presupuesto = self.presupuesto + self.apuesta
             elif self.winner == 2:
                 self.presupuesto = self.presupuesto - self.apuesta
+
+    '''
 
     def __checkWinner(self):
         if self.__checkBlowCards():
@@ -314,7 +349,7 @@ class GameAI():
     def __dealCard(self, Hand):
         Hand.add_Carta(self.mazo.deal())
 
-    def __dealCardDealer(self, Hand):
+    def __dealCardDealer(self):
         if self.manoDealer.get_valor() < 17:
             self.__dealCard(self.manoDealer)
 
@@ -326,7 +361,7 @@ class GameAI():
             return True
         return False
 
-    def __getCards(self, Hand):
+    def __getCards(self, Hand, isDealer):
         # NumeroTipoCarta
         cards = []
 
@@ -345,12 +380,14 @@ class GameAI():
 
             cards.append(valor + tipo)
 
+        if isDealer == True and self.gameState == 1:
+            return {cards[1]}
+
         return cards
 
     # Communication Functions
-
-    def setOutputPlayer(self, output):
-        self.outputPlayer = output
+    def setActionPlayer(self, output):
+        self.actionPlayer = output
     
     def getGameState(self):
         return self.gameState
@@ -361,14 +398,18 @@ class GameAI():
     def getPresupuesto(self):
         return self.prespuesto
 
-    def setReady(self, Ready):
-        self.ready = Ready
-
     def getCardsAI(self):
-        return self.__getCards(self.manoJugador)
+        return self.__getCards(self.manoJugador, False)
 
     def getCardsDealer(self):
-        return self.__getCards(self.manoDealer)
+        if self.gameState == 1:
+            return self.__getCards(self.manoDealer, True)
+        else: 
+            return self.__getCards(self.manoDealer, True)
 
     def setApuesta(self, apuestaAmount):
-        self.apuesta = apuestaAmount 
+        self.apuesta = apuestaAmount
+        self.apuestaTotal = self.apuesta
+
+    def hasGameFinished(self):
+        return self.gameState == 7
