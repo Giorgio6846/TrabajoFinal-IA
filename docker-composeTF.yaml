@@ -5,10 +5,9 @@ services:
     image: tfstandalone:tag
     build:
       context: .
-      dockerfile: Solo.Dockerfile
+      dockerfile: TFstandalone.Dockerfile
     restart: 'always'
     ports:
       - '8888:8888'
     volumes: 
       - .\dataset:/tf/dataset:dataset
-      - .\app:/tf/app:app
