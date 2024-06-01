@@ -13,7 +13,7 @@ class BlackjackGame:
         "spades": spade,
         "clubs": club
     }
-
+    #inicializacion de las variables de juego
     def __init__(self):
         self.deck = self.generate_deck()
         random.shuffle(self.deck)
@@ -33,13 +33,15 @@ class BlackjackGame:
     def deal_card(self):
         return self.deck.pop()
 
+    #fucion para empezar el juego, donde se crean las manos de los jugadores
     def start_game(self, bet):
         self.player_hand = [self.deal_card(), self.deal_card()]
         self.dealer_hand = [self.deal_card(), self.deal_card()]
-        self.bet_game = bet
+        self.bet_game = bet #se incializa la variable apuesta que es introducida como un parametro
         self.splitted_hands = []  
         self.current_hand_index = 0
 
+    #Funcion para obtener el valor de la mano del jugador.
     @staticmethod
     def hand_value(hand):
         value = 0
@@ -58,13 +60,18 @@ class BlackjackGame:
             aces -= 1
         return value
 
+
+    #todas las acciones que puede realizar el jugador
     def player_action(self, action):
+        #"Hit" automaticamente se introduce una carta de la baraja a la mano del jugador y se borra una carta del array del mazo.
         if action == "hit":
             self.player_hand.append(self.deal_card())
+        # "Double" cuando se dobla el tamaño de la apuesta, pero solo se obtiene una carta mas y la accion pasa a automaticamente a "stay"
         elif action == "double":
             self.bet_game *= 2
             self.player_hand.append(self.deal_card())
             action = "stay"
+        # "Split" divide la mano del jugador en 2, doblando la apuesta (solo aplica cuando la mano del jugador cuenta con 2 cartas del mismo numero)
         elif action == "split":
             if len(self.player_hand) == 2 and self.player_hand[0]['number'] == self.player_hand[1]['number']:
                 self.splitted_hands = [[self.player_hand[0]], [self.player_hand[1]]]
@@ -75,12 +82,20 @@ class BlackjackGame:
             else:
                 print("El split solo es permitido con 2 cartas del mismo valor en la mano")
         return action, self.game_status()
+    
+    #funcion para retornar el valor de la apuesta, en caso de que se doble o se haga split.  
+    def return_bounty(self, bet, action):
+        if(action == "double"):
+            return bet*2
+        return bet
 
+    #se hace la funcion para que el dealer tome cartas en caso de que la suma de su mano sea menor a 17
     def dealer_action(self):
         while self.hand_value(self.dealer_hand) < 17:
             self.dealer_hand.append(self.deal_card())
             print("Dealer hits and has:", self.format_cards(self.dealer_hand), self.hand_value(self.dealer_hand))
 
+    #se confirma si el jugador obtuvo 21, o voló
     def game_status(self):
         player_value = self.hand_value(self.player_hand)
         if player_value > 21:
@@ -90,6 +105,7 @@ class BlackjackGame:
         else:
             return "continue"
 
+    # Se obtienen los valores de las manos del dealer y del jugador y se comparan  
     def game_result(self):
         self.dealer_action()
         player_value = self.hand_value(self.player_hand)
@@ -104,6 +120,7 @@ class BlackjackGame:
         else:
             return "loss"
     
+    #formato para imprimir cartas
     @staticmethod
     def format_cards(cards):
         result = ""
