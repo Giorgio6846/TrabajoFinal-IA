@@ -1,13 +1,15 @@
 <template>
-  <mainScreen></mainScreen>
+  <formUser></formUser>
+  <h1>Screen Share</h1>
+  <button id="startButton">Start Screen Share</button>
 </template>
 
 <script>
-import mainScreen from "./components/formUser.vue";
+import formUser from "./components/formUser.vue";
 
 export default {
   components: {
-    mainScreen: mainScreen,
+    formUser: formUser,
   },
 };
 </script>
@@ -21,4 +23,5 @@ export default {
   color: #2c3e50;
   margin-top: 60px;
 }
-</style>./components/form.vue
+</style>
+./components/form.vue
