@@ -1,4 +1,9 @@
 const { defineConfig } = require("@vue/cli-service");
 module.exports = {
-  publicPath: process.env.NODE_ENV === "production" ? "./" : "/",
+  pluginOptions: {
+    electron: {
+      mainProcessFile: "src/background.js",
+      rendererProcessFile: "src/main.js",
+    },
+  },
 };
