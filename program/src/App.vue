@@ -1,15 +1,13 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png" />
-  <HelloWorld msg="Welcome to asdasds Vue.js App" />
+  <mainScreen></mainScreen>
 </template>
 
 <script>
-import HelloWorld from "./components/HelloWorld.vue";
+import mainScreen from "./components/formUser.vue";
 
 export default {
-  name: "App",
   components: {
-    HelloWorld,
+    mainScreen: mainScreen,
   },
 };
 </script>
@@ -23,4 +21,4 @@ export default {
   color: #2c3e50;
   margin-top: 60px;
 }
-</style>
+</style>./components/form.vue
