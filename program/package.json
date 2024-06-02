@@ -1,18 +1,4 @@
 {
-<<<<<<< Updated upstream
-  "name": "blackjack-app",
-  "version": "1.0.0",
-  "main": "index.js",
-  "author": "",
-  "license": "ISC",
-  "description": "",
-  "scripts": {
-    "start": "electron ."
-  },
-  "devDependencies": {
-    "electron": "^30.0.3",
-    "electron-reloader": "^1.2.3"
-=======
   "name": "electron-vue",
   "version": "0.1.0",
   "private": true,
@@ -22,7 +8,6 @@
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint"
->>>>>>> Stashed changes
   },
   "dependencies": {
     "core-js": "^3.8.3",
