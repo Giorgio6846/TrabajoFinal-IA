@@ -1,41 +1,45 @@
-const { app, BrowserWindow } = require("electron");
-
-const url = require("url");
+const { app, BrowserWindow, ipcMain } = require("electron");
 const path = require("path");
-
-let mainWindow;
+const screenshot = require("screenshot-desktop");
 
 function createWindow() {
-  mainWindow = new BrowserWindow({
-    width: 1200,
-    height: 800,
+  const mainWindow = new BrowserWindow({
+    width: 800,
+    height: 600,
     webPreferences: {
-      nodeIntegration: true,
+      preload: path.join(__dirname, "preload.js"),
+      contextIsolation: true, // Ensure context isolation is enabled
+      nodeIntegration: false, // Disable node integration for security
     },
   });
 
-  mainWindow.loadURL(
-    url.format({
-      pathname: path.join(__dirname, `./dist/index.html`),
-      protocol: "file:",
-      slashes: true,
-    })
-  );
-  mainWindow.on("closed", function () {
-    mainWindow = null;
-  });
+  mainWindow.loadFile("index.html");
 }
-console.log(app);
-app.on("ready", createWindow);
 
-app.on("window-all-closed", function () {
-  if (process.platform !== "darwin") app.quit();
+app.whenReady().then(() => {
+  createWindow();
+
+  app.on("activate", () => {
+    if (BrowserWindow.getAllWindows().length === 0) {
+      createWindow();
+    }
+  });
 });
 
-app.on("activate", function () {
-  if (mainWindow === null) createWindow();
+app.on("window-all-closed", () => {
+  if (process.platform !== "darwin") {
+    app.quit();
+  }
 });
 
-try {
-  require("electron-reloader")(module);
-} catch (_) {}
+ipcMain.handle("take-screenshot", async () => {
+  try {
+    const timestamp = Date.now();
+    const imgPath = path.join(__dirname, `screenshot-${timestamp}.jpg`);
+    await screenshot({ filename: imgPath });
+    return imgPath;
+  } catch (error) {
+    console.error("Failed to take screenshot:", error);
+    throw error;
+  }
+});
