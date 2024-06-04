@@ -15,9 +15,9 @@ class DQN:
         self.alpha = alpha
         self.memory = deque(maxlen=2000)  # Aquí se define la memoria de repetición
         self.gamma = 0.95    # factor de descuento para las recompensas futuras
-        self.epsilon = 0.3   # tasa de exploración inicial
+        self.epsilon = 0.9   # tasa de exploración inicial
         self.epsilon_min = 0.01  # tasa de exploración mínima
-        self.epsilon_decay = 0.345  # factor de decaimiento de la tasa de exploración
+        self.epsilon_decay = 0.995  # factor de decaimiento de la tasa de exploración
         self.model = self._build_model()  # construcción del modelo DQN
 
 
@@ -75,9 +75,9 @@ class DQN:
 
             dealer_card = int(game.dealer_hand[0]['number']) if game.dealer_hand[0]['number'] not in ['J', 'Q', 'K', 'A'] else (
                 10 if game.dealer_hand[0]['number'] != 'A' else 11)
-            status = "continue"
+            status = ["act","continue"]
 
-            while status == "continue":
+            while status[1] == "continue":
                 player_sum = game.hand_value(game.player_hand)
                 usable_ace = self.has_usable_ace(game.player_hand)
                 state = np.array([player_sum, dealer_card, usable_ace])
@@ -93,16 +93,16 @@ class DQN:
 
                 reward = 0  # Intermediate reward, only final matters
 
-                if status == "player_blackjack":
-                    reward = bet
-                elif status == "player_bust":
-                    reward = -bet
+                if status[1] == "player_blackjack":
+                    reward += bet
+                elif status[1] == "player_bust":
+                    reward -= bet
 
                 if reward != 0:
-                    done = status in ["player_blackjack", "player_bust"]
+                    done = status[1] in ["player_blackjack", "player_bust"]
                     self.remember(state, action, reward, next_state, done)
 
-                if action_str == "stay":
+                if status[0] == "stay":
                     break
 
             final_result = game.game_result()
@@ -110,16 +110,16 @@ class DQN:
             self.remember(state, action, final_reward, next_state, True)
 
             if len(self.memory) > batch_size:
-                self.replay(batch_size)
+               self.replay(batch_size)
 
     def play(self, bet):
         game = BlackjackGame()
         game.start_game(bet)
 
         print("Dealer shows:", game.format_cards(game.dealer_hand[:1]))
-        status = "continue"
+        status = ["act", "continue"]
         print(game.format_cards(game.player_hand), game.hand_value(game.player_hand))
-        while status == "continue":
+        while status[1] == "continue":
             player_sum = game.hand_value(game.player_hand)
             usable_ace = self.has_usable_ace(game.player_hand)
             dealer_card = int(game.dealer_hand[0]['number']) if game.dealer_hand[0]['number'] not in ['J', 'Q', 'K', 'A'] else (
@@ -135,7 +135,7 @@ class DQN:
 
             print(game.format_cards(game.player_hand), game.hand_value(game.player_hand))
 
-        if status == "continue":
+        if status[1] == "continue":
             print("Dealer has:", game.format_cards(game.dealer_hand), game.hand_value(game.dealer_hand))
             game.dealer_action()
 
