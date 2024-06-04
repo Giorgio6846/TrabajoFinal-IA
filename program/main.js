@@ -1,5 +1,5 @@
 require("electron-reload")(__dirname);
-const { app, BrowserWindow, ipcMain } = require("electron");
+const { app, BrowserWindow, ipcMain, Menu } = require("electron");
 const path = require("path");
 const screenshot = require("screenshot-desktop");
 
@@ -17,6 +17,36 @@ function createWindow() {
   mainWindow.loadFile("./src/pages/index.html");
 }
 
+const mainMenu = [
+    {
+        label: 'Dev',
+        submenu: [
+            {
+                role: 'toggledevtools'
+            },
+            {
+                role: 'reload'
+            },
+            {
+                role: 'forcereload'
+            }
+        ]
+    },
+    {
+        label: 'Settings',
+        submenu: [
+            {
+                label: 'Server Connection',
+                click: async() => {
+                    win.loadFile(path.join(__dirname,'src','views','serverConnection.html'))
+                }
+            }
+        ]
+    }
+]
+
+const menu = Menu.buildFromTemplate(mainMenu)
+Menu.setApplicationMenu(menu)
 app.whenReady().then(() => {
   createWindow();
 
