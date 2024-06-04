@@ -65,6 +65,7 @@ class DQN:
         one_percent = round(episodes / 100)
 
         for ep in range(episodes):
+            print(ep)
             game = BlackjackGame()
             bet = 5
             game.start_game(bet)
