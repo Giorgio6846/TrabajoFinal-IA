@@ -20,6 +20,16 @@ html {
   justify-content: center;
 }
 
+.form input,
+select {
+  margin: 5px 0px;
+  border-radius: 10px;
+}
+
+.startProgram {
+  height: 40px;
+}
+
 form {
   display: flex;
   flex-direction: column;
