@@ -1,0 +1,28 @@
+body {
+  background-color: rgb(22, 21, 21);
+  color: white;
+  width: 100%;
+  height: 100%;
+  margin: 0px;
+}
+
+html {
+  width: 100%;
+  height: 100%;
+  margin: 0px;
+}
+
+.form {
+  font-size: 1.3rem;
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 50%;
+}

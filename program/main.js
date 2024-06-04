@@ -1,3 +1,4 @@
+require("electron-reload")(__dirname);
 const { app, BrowserWindow, ipcMain } = require("electron");
 const path = require("path");
 const screenshot = require("screenshot-desktop");
@@ -13,7 +14,7 @@ function createWindow() {
     },
   });
 
-  mainWindow.loadFile("index.html");
+  mainWindow.loadFile("./pages/index.html");
 }
 
 app.whenReady().then(() => {
@@ -35,7 +36,11 @@ app.on("window-all-closed", () => {
 ipcMain.handle("take-screenshot", async () => {
   try {
     const timestamp = Date.now();
-    const imgPath = path.join(__dirname, `screenshot-${timestamp}.jpg`);
+    const imgPath = path.join(
+      __dirname,
+      "/screenshots",
+      `screenshot-${timestamp}.jpg`
+    );
     await screenshot({ filename: imgPath });
     return imgPath;
   } catch (error) {

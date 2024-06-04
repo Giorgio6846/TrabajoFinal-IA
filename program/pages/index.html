@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Proyecto Inteligencia Artificial</title>
+    <link rel="stylesheet" type="text/css" href="../styles/form.css" />
+  </head>
+
+  <body>
+    <h1>Proyecto Inteligencia Artificial</h1>
+    <section>
+      <button id="screenshotBtn">Take Screenshot</button> <br />
+      <img id="screenshot" src="" alt="Screenshot will appear here" />
+    </section>
+    <section class="form">
+      <form action="./mainPage" method="post">
+        <label for="fname">Nombre:</label>
+        <input type="text" id="fname" name="fname" />
+
+        <label for="age">Edad:</label>
+        <input type="number" id="age" name="age" />
+
+        <label for="income">Ingresos:</label>
+        <input type="number" id="income" name="income" />
+
+        <label for="gender">Genero:</label>
+        <select id="gender" name="gender">
+          <option value="male">Male</option>
+          <option value="female">Female</option>
+        </select>
+
+        <label for="cStatus">Estado civil:</label>
+        <select id="cStatus" name="cStatus">
+          <option value="solter@">Soltero/a</option>
+          <option value="casad@">Casado/a</option>
+          <option value="divorciad@">Divociardo/a</option>
+        </select>
+
+        <label for="education">Nivel educativo:</label>
+        <select id="education" name="education">
+          <option value="primary">Primaria</option>
+          <option value="secondary">Secundaria</option>
+          <option value="university">Universidad</option>
+        </select>
+
+        <input type="submit" value="Submit" />
+      </form>
+    </section>
+
+    <script>
+      document
+        .getElementById("screenshotBtn")
+        .addEventListener("click", async () => {
+          try {
+            const imgPath = await window.electronAPI.takeScreenshot();
+            document.getElementById(
+              "screenshot"
+            ).src = `${imgPath}?${Date.now()}`;
+          } catch (error) {
+            console.error("Failed to take screenshot:", error);
+          }
+        });
+    </script>
+  </body>
+</html>
