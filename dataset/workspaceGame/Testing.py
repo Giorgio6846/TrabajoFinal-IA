@@ -1,11 +1,11 @@
 import numpy as np
 import random
 from collections import deque
-from blackjack import BlackjackGame
 from tensorflow.keras import layers, models
 import tensorflow as tf
-from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.optimizers import Adamclear
 
+from blackjack import BlackjackGame
 
 class Test:
     def __init__(self, model):

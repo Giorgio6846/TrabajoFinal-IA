@@ -12,7 +12,10 @@ if __name__ == "__main__":
     batch_size = 8
 
     agent = DQNAgent(state_size, action_size, 0.01, EPISODES, batch_size)
-    env = BJEnvironment()
+    #env = BJEnvironment()
+    env = gym.vector.AsyncVectorEnv([
+        lambda: BJEnvironment()
+    ])
 
     for ep in range(EPISODES):
         print(ep)

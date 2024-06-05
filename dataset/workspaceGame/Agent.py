@@ -63,5 +63,7 @@ class DQNAgent:
                 done = True
                 self.remember(state, action, reward, next_state, True)        
         
+        
+
             if len(self.memory) > self.batch_size:
                 self.replay(self.batch_size)
