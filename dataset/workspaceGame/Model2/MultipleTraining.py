@@ -1,7 +1,9 @@
 import os
+import gymnasium as gym
 
 from Agent import DQNAgent
 from Environment import BJEnvironment
+
 
 if __name__ == "__main__":
     EPISODES = 1000
@@ -12,7 +14,9 @@ if __name__ == "__main__":
     agent = DQNAgent(state_size, action_size, 0.01, EPISODES, batch_size)
     env = BJEnvironment()
 
-    agent.train(env)
+    for ep in range(EPISODES):
+        print(ep)
+        agent.train(env)
 
     checkpoint_path = "models/v{ver}/training_{trainVer}/cp-{epoch:04d}.weights.h5"
     checkpoint_dir = os.path.dirname(checkpoint_path)

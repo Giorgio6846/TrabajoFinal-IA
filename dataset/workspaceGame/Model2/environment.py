@@ -19,7 +19,7 @@ class BJEnvironment(gym.Env):
     def __init__(self):
         self.game = BlackjackGame()
         self.bet = 5
-        
+
         self.state_size = 3
         self.action_size = 3
 
@@ -42,7 +42,7 @@ class BJEnvironment(gym.Env):
 
             if status[0] == "stay":
                 1==1
-                
+
             final_result = self.game.game_result()
             final_reward = (
                 bet
@@ -50,9 +50,7 @@ class BJEnvironment(gym.Env):
                 else (-bet if final_result == "loss" else 0)
             )
 
-        infReturn = np.array([state, action, reward, self.get_obs(), done])
-
-        return infReturn
+        return state, action, reward, self.get_obs(), done
 
     def get_obs(self):
         dealer_card = (
@@ -65,8 +63,10 @@ class BJEnvironment(gym.Env):
         usable_ace = self.has_usable_ace(self.game.player_hand)
         state = np.array([player_sum, dealer_card, usable_ace])
         state = np.reshape(state, [1, self.state_size])
+        return state
 
     def reset(self):
+        self.game = BlackjackGame()
         self.game.start_game(self.bet)
 
         self.status = ["act", "continue"]

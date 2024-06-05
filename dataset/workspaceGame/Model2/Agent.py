@@ -56,9 +56,11 @@ class DQNAgent:
         
         while not done:
             obs = env.get_obs()
-            state, action, reward, next_state, doneEnv = env.step(self.act(obs))
+            action = self.act(obs)
+            state, action, reward, next_state, doneEnv = env.step(action)
             
             if doneEnv == 1:
+                done = True
                 self.remember(state, action, reward, next_state, True)        
         
             if len(self.memory) > self.batch_size:
