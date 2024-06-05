@@ -8,8 +8,9 @@ from tensorflow.keras.optimizers import Adam
 
 
 class Test:
-    def __init__(self, model):
-        self.model = model # construcción del modelo DQN
+    def __init__(self):
+        self.model = keras.create_model()
+        # construcción del modelo DQN
 
     def act(self, state):
         if np.random.rand() <= self.epsilon:
@@ -68,9 +69,9 @@ class Test:
         final_result = game.game_result()
         return final_result
 
-
 if __name__ == "__main__":
-    modelTest = Test(models.load_model("./models/v1/training_1"))
+    modelTest = Test()
+    modelTest.load_weights("models/v1/training_1/cp-0002.weights.h5")
 
     # Evaluate the agent
     test_games = 10000
