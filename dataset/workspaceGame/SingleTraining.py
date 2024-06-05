@@ -6,7 +6,6 @@ from tensorflow.keras import layers, models
 import tensorflow as tf
 from tensorflow.keras.optimizers import Adam
 
-
 class DQN:
 
     def __init__(self, state_size, action_size, alpha=0.01):
@@ -19,7 +18,6 @@ class DQN:
         self.epsilon_min = 0.01  # tasa de exploración mínima
         self.epsilon_decay = 0.995  # factor de decaimiento de la tasa de exploración
         self.model = self._build_model()  # construcción del modelo DQN
-
 
     def _build_model(self):
         model = models.Sequential()

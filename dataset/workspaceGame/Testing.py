@@ -8,13 +8,11 @@ from tensorflow.keras.optimizers import Adam
 
 
 class Test:
-    def __init__(self):
-        self.model = keras.create_model()
-        # construcción del modelo DQN
-
+    def __init__(self, model):
+        self.model = model
+        self.state_size = 3
+    
     def act(self, state):
-        if np.random.rand() <= self.epsilon:
-            return random.randrange(self.action_size)
         act_values = self.model.predict(state)
         return np.argmax(act_values[0])
 
@@ -70,17 +68,20 @@ class Test:
         return final_result
 
 if __name__ == "__main__":
-    modelTest = Test()
-    modelTest.load_weights("models/v1/training_1/cp-0002.weights.h5")
+    model_path = "models/v1/training_1/cp-0001.keras"
+    loadModel = tf.keras.models.load_model(model_path)
+
+    TestClass = Test(loadModel)
 
     # Evaluate the agent
     test_games = 10000
     wins, losses, draws = 0, 0, 0
 
-    for index in range(test_games):
+    for index in range(1,test_games):
         print("-----")
+        print(index)
         bet = 5
-        result = modelTest.play(bet)
+        result = TestClass.play(bet)
         print(result)
         if result == "win":
             wins += 1

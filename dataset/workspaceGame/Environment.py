@@ -22,7 +22,7 @@ class BJEnvironment(gym.Env):
 
         self.state_size = 3
         self.action_size = 3
-
+        
     def step(self,action):
         state = self.get_obs()
 
