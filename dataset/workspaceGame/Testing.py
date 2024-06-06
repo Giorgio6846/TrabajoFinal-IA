@@ -1,20 +1,20 @@
 import numpy as np
 import random
 from collections import deque
-from tensorflow.keras import layers, models
 import tensorflow as tf
-from tensorflow.keras.optimizers import Adamclear
 
 from blackjack import BlackjackGame
+from Tools import SaveModel, Model
+
+VERSION = 1
+COMPLETEDVERSION = 1
 
 class Test:
     def __init__(self, model):
+        self.ModelClass = Model()
+
         self.model = model
         self.state_size = 3
-    
-    def act(self, state):
-        act_values = self.model.predict(state)
-        return np.argmax(act_values[0])
 
     @staticmethod
     def has_usable_ace(hand):
@@ -45,7 +45,9 @@ class Test:
             )
             state = np.array([player_sum, dealer_card, usable_ace])
             state = np.reshape(state, [1, self.state_size])
-            action = self.act(state)
+            action = self.ModelClass.act(
+                state, self.epsilon, self.action_size, self.model
+            )
             action_str = ["hit", "stay", "double"][action]
             status = game.player_action(action_str)
 
@@ -68,10 +70,10 @@ class Test:
         return final_result
 
 if __name__ == "__main__":
-    model_path = "models/v1/training_1/cp-0001.keras"
-    loadModel = tf.keras.models.load_model(model_path)
-
-    TestClass = Test(loadModel)
+    save = SaveModel()
+    model = save.loadModel(VERSION, COMPLETEDVERSION)
+    
+    TestClass = Test(model) 
 
     # Evaluate the agent
     test_games = 10000

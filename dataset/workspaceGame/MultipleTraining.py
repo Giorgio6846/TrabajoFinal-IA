@@ -3,28 +3,29 @@ import gymnasium as gym
 
 from Agent import DQNAgent
 from Environment import BJEnvironment
+from Tools import SaveModel
 
+VERSION = 1
+EPOCH = 1
+COMPLETEDVERSION = 1
 
 if __name__ == "__main__":
-    EPISODES = 1000
+    EPISODES = 100
     state_size = 3  # player_sum, dealer_card, usable_ace
     action_size = 3  # hit, stay, double
     batch_size = 8
 
     agent = DQNAgent(state_size, action_size, 0.01, EPISODES, batch_size)
-    #env = BJEnvironment()
-    env = gym.vector.AsyncVectorEnv([
-        lambda: BJEnvironment()
-    ])
+    save = SaveModel()
+
+    env = BJEnvironment()
+    
+    #env = gym.vector.AsyncVectorEnv([
+    #    lambda: BJEnvironment()
+    #])
 
     for ep in range(EPISODES):
         print(ep)
         agent.train(env)
-
-    checkpoint_path = "models/v{ver}/training_{trainVer}/cp-{epoch:04d}.keras"
-    checkpoint_dir = os.path.dirname(checkpoint_path)
-
-    print(checkpoint_path)
-    print(checkpoint_dir)
-
-    agent.model.save(checkpoint_path.format(ver=1, trainVer=2, epoch=1))
+    
+    save.saveModel(agent.model, VERSION, COMPLETEDVERSION)

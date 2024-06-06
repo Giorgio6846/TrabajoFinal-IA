@@ -5,6 +5,20 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Debug MultipleTraining",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/dataset/workspaceGame/MultipleTraining.py",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Debug SingleTraining",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/dataset/workspaceGame/SingleTraining.py",
+            "console": "integratedTerminal"
+        },
+        {
             "name": "Debug Main Process",
             "type": "node",
             "request": "launch",

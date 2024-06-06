@@ -60,7 +60,6 @@ class BlackjackGame:
             aces -= 1
         return value
 
-
     #todas las acciones que puede realizar el jugador
     def player_action(self, action):
         #"Hit" automaticamente se introduce una carta de la baraja a la mano del jugador y se borra una carta del array del mazo.
@@ -130,8 +129,6 @@ class BlackjackGame:
         
         return result.strip()
 
-
-
 def main():
     game = BlackjackGame()
     print("select your bet:")
@@ -156,4 +153,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-            
