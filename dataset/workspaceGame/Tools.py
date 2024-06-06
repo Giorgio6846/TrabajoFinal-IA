@@ -1,5 +1,5 @@
 import os
-from tensorflow.keras import layers, models
+from tensorflow.keras import layers, models, Input
 from tensorflow.keras.optimizers import Adam
 import numpy as np
 import random
@@ -37,7 +37,7 @@ class Model:
 
     def _build_model(self, state_size, action_size):
         model = models.Sequential()
-        model.add(layers.Dense(24, input_dim=state_size, activation="relu"))
+        model.add(Input(shape = (state_size, 0)))
         model.add(layers.Dense(24, activation="relu"))
         model.add(layers.Dense(action_size, activation="linear"))
         custom_optimizer = Adam(learning_rate=0.01)

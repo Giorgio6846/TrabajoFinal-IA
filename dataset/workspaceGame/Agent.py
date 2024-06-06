@@ -50,4 +50,3 @@ class DQNAgent:
 
         if len(self.memory) > self.batch_size:
             self.replay(self.batch_size)
-            
