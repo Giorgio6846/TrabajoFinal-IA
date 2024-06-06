@@ -19,7 +19,7 @@ class DQNAgent:
         self.epsilon = 0.9  # tasa de exploración inicial
         self.epsilon_min = 0.01  # tasa de exploración mínima
         self.epsilon_decay = 0.995  # factor de decaimiento de la tasa de exploración
-        self.model = self.ModelClass._build_model()  # construcción del modelo DQN
+        self.model = self.ModelClass._build_model(self.state_size, self.action_size)  # construcción del modelo DQN
 
     def replay(self, batch_size):
         minibatch = random.sample(self.memory, batch_size)
@@ -48,5 +48,6 @@ class DQNAgent:
                 done = True
                 self.ModelClass.remember(state, action, reward, next_state, True, self.memory)        
 
-            if len(self.memory) > self.batch_size:
-                self.replay(self.batch_size)
+        if len(self.memory) > self.batch_size:
+            self.replay(self.batch_size)
+            

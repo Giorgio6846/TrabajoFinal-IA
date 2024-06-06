@@ -13,7 +13,7 @@ if __name__ == "__main__":
     EPISODES = 100
     state_size = 3  # player_sum, dealer_card, usable_ace
     action_size = 3  # hit, stay, double
-    batch_size = 8
+    batch_size = 32
 
     agent = DQNAgent(state_size, action_size, 0.01, EPISODES, batch_size)
     save = SaveModel()
