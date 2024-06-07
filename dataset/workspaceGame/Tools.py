@@ -1,5 +1,5 @@
 import os
-from tensorflow.keras import layers, models, Input
+from tensorflow.keras import layers, models, Input, callbacks
 from tensorflow.keras.optimizers import Adam
 import numpy as np
 import random
@@ -18,7 +18,6 @@ class SaveModel:
 
     def loadCheckpoint(self, model, VERSION, EPOCH):
         path_dir = os.path.dirname(self.checkpointPath)
-
         return model.load_weights(self.checkpointPath.format(ver=VERSION, epoch=EPOCH))
 
     def saveModel(self, model, VERSION, COMPLETEDVERSION):
@@ -32,16 +31,20 @@ class SaveModel:
         return models.load_model(
             self.modelPath.format(ver=VERSION, comVer=COMPLETEDVERSION)
         )
-
+             
 class Model:
 
     def _build_model(self, state_size, action_size):
         model = models.Sequential()
-        model.add(Input(shape = (state_size, 0)))
-        model.add(layers.Dense(24, activation="relu"))
+        model.add(Input(shape = [state_size], dtype = 'uint8'))
+        model.add(layers.Dense(64, activation="relu"))
         model.add(layers.Dense(action_size, activation="linear"))
+        
         custom_optimizer = Adam(learning_rate=0.01)
-        model.compile(loss="mse", optimizer=custom_optimizer)
+        model.compile(loss="mse", optimizer=custom_optimizer, metrics =['accuracy'])
+
+        model.summary()
+    
         return model
 
     def act(self, state, epsilon, action_size, model):

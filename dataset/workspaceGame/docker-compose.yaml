@@ -1,0 +1,9 @@
+version: '3'
+
+services:
+  Tensorboard:
+    image: schafo/tensorboard
+    ports:
+      - '6006:6006'
+    volumes:
+      - /logs/train/:/app/runs:ro

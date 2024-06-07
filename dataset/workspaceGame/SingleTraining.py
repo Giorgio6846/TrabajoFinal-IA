@@ -2,9 +2,7 @@ import numpy as np
 import random
 from collections import deque
 from blackjack import BlackjackGame
-from tensorflow.keras import layers, models
-import tensorflow as tf
-from tensorflow.keras.optimizers import Adam
+
 from Tools import SaveModel, Model
 
 VERSION = 1
