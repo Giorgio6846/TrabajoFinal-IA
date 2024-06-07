@@ -3,6 +3,7 @@ import numpy as np
 import random
 from Tools import Model
 import tensorflow as tf
+from Environment import BJEnvironment
 
 VERBOSETRAIN = 1
 
@@ -56,6 +57,26 @@ class DQNAgent:
 
         if self.epsilon > self.epsilon_min:
             self.epsilon *= self.epsilon_decay
+
+    def get_prob_of21(self, p_hand_value, actual_deck):
+        cards_needed = 21 - p_hand_value
+        if cards_needed <= 0:
+            return 0.0 
+        
+        count_needed_cards = 0
+        for card in actual_deck:
+            if card['number'] in ['J', 'Q', 'K']:
+                card_value = 10
+            elif card['number'] == 'A':
+                card_value = 11
+            else:
+                card_value = int(card['number'])
+            
+            if card_value == cards_needed:
+                count_needed_cards += 1
+
+        prob = count_needed_cards / len(actual_deck)
+        return prob
 
     def train(self, env, STT):
         self.SaveToTensorboard = STT

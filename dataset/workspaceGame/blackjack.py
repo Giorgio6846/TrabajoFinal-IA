@@ -23,11 +23,19 @@ class BlackjackGame:
         self.player_hand = []
         self.dealer_hand = []
 
+    def get_deck(self):
+        return self.deck
+
+
+    def set_deck(self, new_deck):
+        self.deck = new_deck
+
     @staticmethod
     def generate_deck():
         numbers = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A']
         suits = ['hearts', 'diamonds', 'clubs', 'spades']
         deck = [{'number': number, 'suit': suit} for number in numbers for suit in suits]
+        deck = deck*6
         return deck
 
     def deal_card(self):
