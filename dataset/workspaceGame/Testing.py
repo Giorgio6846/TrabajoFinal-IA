@@ -8,6 +8,8 @@ from Tools import SaveModel, Model
 
 VERSION = 1
 COMPLETEDVERSION = 1
+VERBOSETRAIN = 1
+
 
 class Test:
     def __init__(self, model):
@@ -15,6 +17,7 @@ class Test:
 
         self.model = model
         self.state_size = 3
+        self.epsilon = 0
 
     @staticmethod
     def has_usable_ace(hand):
@@ -27,6 +30,10 @@ class Test:
             )
             ace |= card_number == "A"
         return int(ace and value + 10 <= 21)
+
+    def act(self, state):
+        act_values = model.predict(state, verbose=VERBOSETRAIN)
+        return np.argmax(act_values[0])
 
     def play(self, bet):
         game = BlackjackGame()
@@ -45,9 +52,7 @@ class Test:
             )
             state = np.array([player_sum, dealer_card, usable_ace])
             state = np.reshape(state, [1, self.state_size])
-            action = self.ModelClass.act(
-                state, self.epsilon, self.action_size, self.model
-            )
+            action = self.act(state)
             action_str = ["hit", "stay", "double"][action]
             status = game.player_action(action_str)
 
@@ -69,17 +74,18 @@ class Test:
         final_result = game.game_result()
         return final_result
 
+
 if __name__ == "__main__":
     save = SaveModel()
     model = save.loadModel(VERSION, COMPLETEDVERSION)
-    
-    TestClass = Test(model) 
+
+    TestClass = Test(model)
 
     # Evaluate the agent
     test_games = 10000
     wins, losses, draws = 0, 0, 0
 
-    for index in range(1,test_games):
+    for index in range(1, test_games):
         print("-----")
         print(index)
         bet = 5

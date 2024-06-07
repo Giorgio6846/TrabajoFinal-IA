@@ -4,7 +4,7 @@ import random
 from Tools import Model
 import tensorflow as tf
 
-VERBOSETRAIN = 0
+VERBOSETRAIN = 1
 
 class DQNAgent:
     def __init__(
