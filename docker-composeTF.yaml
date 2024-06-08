@@ -2,10 +2,10 @@ version: '3'
 
 services:
   tensorflow:
-    image: solotensorflow:tag
+    image: tfstandalone:tag
     build:
       context: .
-      dockerfile: Solo.Dockerfile
+      dockerfile: TFstandalone.Dockerfile
     restart: 'always'
     ports:
       - '8888:8888'
