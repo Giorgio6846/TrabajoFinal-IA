@@ -2,7 +2,7 @@ import gymnasium as gym
 from gymnasium import spaces
 import numpy as np
 
-from blackjack import BlackjackGame
+from Blackjack import BlackjackGame
 
 class BJEnvironment(gym.Env):
     def __init__(self):

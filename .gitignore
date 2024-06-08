@@ -15,3 +15,4 @@ dataset/workspaceGame/.DS_Store
 /env
 /dataset/workspaceGame/Model2/__pycache__
 /dataset/workspaceGame/models/v1/logs
+/dataset/workspaceGame/models/v2/logs

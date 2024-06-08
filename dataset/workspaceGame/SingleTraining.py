@@ -1,6 +1,6 @@
 from Agent import DQNAgent
 from Environment import BJEnvironment
-from Tools import SaveModel, Model
+from Tools import SaveModel
 
 
 VERSION = 1

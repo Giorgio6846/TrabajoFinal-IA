@@ -1,7 +1,4 @@
 import numpy as np
-import random
-from collections import deque
-import tensorflow as tf
 
 from blackjack import BlackjackGame
 from Tools import SaveModel, Model

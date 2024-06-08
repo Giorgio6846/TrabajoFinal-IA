@@ -3,7 +3,6 @@ import numpy as np
 import random
 from Tools import Model
 import tensorflow as tf
-from Environment import BJEnvironment
 
 VERBOSETRAIN = 1
 
