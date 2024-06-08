@@ -1,58 +1,84 @@
-const {app, BrowserWindow, ipcMain, systemPreferences, desktopCapturer, Menu} = require('electron');
-const path = require('path');
-const IS_OSX = process.platform === 'darwin';
+require("electron-reload")(__dirname);
+const { app, BrowserWindow, ipcMain, Menu } = require("electron");
+const path = require("path");
+const screenshot = require("screenshot-desktop");
 
-console.log(systemPreferences.getMediaAccessStatus('screen'))
+const createWindow = () => {
+  mainWindow = new BrowserWindow({
+    width: 1200,
+    height: 720,
+    webPreferences: {
+      preload: path.join(__dirname, "preload.js"),
+      contextIsolation: true, // Ensure context isolation is enabled
+      nodeIntegration: false, // Disable node integration for security
+      devTools: true,
+      sandbox: false,
+    },
+  });
 
-const createWindow  = () => {
-    win = new BrowserWindow({
-        width: 800,
-        height: 600,
-        webPreferences: {
-            devTools: true,
-            sandbox: false
-        }
-    })
-
-    win.loadFile(path.join(__dirname,'src','views','mainPage.html'))
-} 
+  mainWindow.loadFile("./src/pages/index.html");
+};
 
 const mainMenu = [
-    {
-        label: 'Dev',
-        submenu: [
-            {
-                role: 'toggledevtools'
-            },
-            {
-                role: 'reload'
-            },
-            {
-                role: 'forcereload'
-            }
-        ]
-    },
-    {
-        label: 'Settings',
-        submenu: [
-            {
-                label: 'Screen Capture',
-                click: async() => {
-                    win.loadFile(path.join(__dirname,'src','views','screnCapture.html'))                
-                }
-            },
-            {
-                label: 'Server Connection',
-                click: async() => {
-                    win.loadFile(path.join(__dirname,'src','views','serverConnection.html'))
-                }
-            }
-        ]
-    }
-]
+  {
+    label: "Dev",
+    submenu: [
+      {
+        role: "toggledevtools",
+      },
+      {
+        role: "reload",
+      },
+      {
+        role: "forcereload",
+      },
+    ],
+  },
+  {
+    label: "Settings",
+    submenu: [
+      {
+        label: "Server Connection",
+        click: async () => {
+          mainWindow.loadFile("./src/pages/serverConnection.html");
+          console.log("TEST");
+        },
+      },
+    ],
+  },
+];
 
-const menu = Menu.buildFromTemplate(mainMenu)
-Menu.setApplicationMenu(menu)
-app.on("ready", () => {
-    createWindow()
+const menu = Menu.buildFromTemplate(mainMenu);
+Menu.setApplicationMenu(menu);
+
+app.whenReady().then(() => {
+  createWindow();
+
+  app.on("activate", () => {
+    if (BrowserWindow.getAllWindows().length === 0) {
+      createWindow();
+    }
+  });
+});
+
+app.on("window-all-closed", () => {
+  if (process.platform !== "darwin") {
+    app.quit();
+  }
+});
+
+ipcMain.handle("take-screenshot", async () => {
+  try {
+    const timestamp = Date.now();
+    const imgPath = path.join(
+      __dirname,
+      "/screenshots",
+      `screenshot-${timestamp}.jpg`
+    );
+    await screenshot({ filename: imgPath });
+    return imgPath;
+  } catch (error) {
+    console.error("Failed to take screenshot:", error);
+    throw error;
+  }
 });
