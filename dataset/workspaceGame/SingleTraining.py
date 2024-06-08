@@ -11,7 +11,7 @@ if __name__ == "__main__":
     batch_size = 32
 
     env = BJEnvironment()
-    agent = DQNAgent(env.state_size, env.action_size, 0.01, EPISODES, batch_size, "./models/v{VERSION}/logs".format(VERSION=VERSION))
+    agent = DQNAgent(env.state_size, env.action_size, 0.01, batch_size, VERSION)
     save = SaveModel()
 
     for ep in range(EPISODES):

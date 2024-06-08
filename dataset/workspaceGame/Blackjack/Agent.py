@@ -5,6 +5,7 @@ from Blackjack.Tools import Model
 import tensorflow as tf
 
 VERBOSETRAIN = 1
+LOGSPATH = "./models/v{VERSION}/logs"
 
 class DQNAgent:
     def __init__(
@@ -12,28 +13,35 @@ class DQNAgent:
         state_size,
         action_size,
         alpha=0.01,
-        episodes=100,
         batch_size=32,
-        log_dir = ""
+        VERSION = 1
     ):
+
         self.ModelClass = Model()
 
-        self.SaveToTensorboard = False
-        self.logDir = log_dir
-    
-        self.episodes = episodes
-        self.batch_size = batch_size
+        #Model Parameters        
         self.state_size = state_size
         self.action_size = action_size
+
+        #HyperParameters
+        self.batch_size = batch_size
         self.alpha = alpha
-        self.memory = deque(maxlen=2000)  # Aquí se define la memoria de repetición
         self.gamma = 0.95  # factor de descuento para las recompensas futuras
         self.epsilon = 0.9  # tasa de exploración inicial
         self.epsilon_min = 0.01  # tasa de exploración mínima
         self.epsilon_decay = 0.995  # factor de decaimiento de la tasa de exploración
+
+        #DQN Config
+        self.memory = deque(maxlen=2000)  # Aquí se define la memoria de repetición
         self.model = self.ModelClass._build_model(
             self.state_size, self.action_size
-        )  # construcción del modelo DQN
+        ) 
+
+        #Save Config
+        self.version = VERSION
+
+        #Debug Config
+        self.SaveToTensorboard = False       
 
     def replay(self, batch_size):
         minibatch = random.sample(self.memory, batch_size)
@@ -48,7 +56,9 @@ class DQNAgent:
 
             if self.SaveToTensorboard:
                 callbacks = tf.keras.callbacks.TensorBoard(
-                    log_dir=self.logDir, histogram_freq=0, write_graph=True
+                    log_dir=LOGSPATH.format(VERSION=self.version),
+                    histogram_freq=0,
+                    write_graph=True,
                 )
                 self.model.fit(state, target_f, epochs=1, verbose=VERBOSETRAIN, callbacks=callbacks)
             else:
@@ -61,7 +71,7 @@ class DQNAgent:
         cards_needed = 21 - p_hand_value
         if cards_needed <= 0:
             return 0.0 
-        
+
         count_needed_cards = 0
         for card in actual_deck:
             if card['number'] in ['J', 'Q', 'K']:
@@ -70,7 +80,7 @@ class DQNAgent:
                 card_value = 11
             else:
                 card_value = int(card['number'])
-            
+
             if card_value == cards_needed:
                 count_needed_cards += 1
 
