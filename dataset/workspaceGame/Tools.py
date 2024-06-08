@@ -1,8 +1,9 @@
 import os
-from tensorflow.keras import layers, models, Input, callbacks
-from tensorflow.keras.optimizers import Adam
+from tensorflow.keras import layers, models, Input
+import tensorflow as tf
 import numpy as np
 import random
+import platform
 
 VERBOSETRAIN = 0
 
@@ -40,8 +41,12 @@ class Model:
         model.add(layers.Dense(64, activation="relu"))
         model.add(layers.Dense(action_size, activation="linear"))
         
-        custom_optimizer = Adam(learning_rate=0.01)
-        model.compile(loss="mse", optimizer=custom_optimizer, metrics =['accuracy'])
+        if platform.system() == "Darwin" and platform.processor() == "arm":
+            opt = tf.keras.optimizers.legacy.Adam(learning_rate=0.01)
+        else:
+            opt = tf.keras.optimizers.Adam(learning_rate=0.01)
+
+        model.compile(loss="mse", optimizer=opt, metrics =['accuracy'])
 
         model.summary()
     
