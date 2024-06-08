@@ -30,6 +30,9 @@ class BlackjackGame:
     def set_deck(self, new_deck):
         self.deck = new_deck
 
+    def regenerate_deck(self):
+        self.deck = self.generate_deck()
+
     @staticmethod
     def generate_deck():
         numbers = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A']

@@ -17,3 +17,4 @@ dataset/workspaceGame/.DS_Store
 /dataset/workspaceGame/models/v1/logs
 /dataset/workspaceGame/models/v2/logs
 /dataset/workspaceGame/Blackjack/__pycache__
+/dataset/workspaceGame/Network/__pycache__

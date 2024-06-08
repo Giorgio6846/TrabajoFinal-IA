@@ -19,14 +19,11 @@ Has a queue if it receives more than one model at the time
 
 if __name__ == "__main__":
     EPISODES = 600
-    state_size = 3  # player_sum, dealer_card, usable_ace
-    action_size = 3  # hit, stay, double
-    batch_size = 32
-
-    agent = DQNAgent(state_size, action_size, 0.01, EPISODES, batch_size, "./models/v{VERSION}/logs".format(VERSION=VERSION))
-    save = SaveModel()
+    batchSize = 32
 
     env = BJEnvironment()
+    agent = DQNAgent(env.state_size, env.action_size, 0.01, EPISODES, batchSize, "./models/v{VERSION}/logs".format(VERSION=VERSION))
+    save = SaveModel()
 
     for ep in range(EPISODES):
         if ep % 10 == 0:        

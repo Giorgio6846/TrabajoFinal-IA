@@ -70,16 +70,11 @@ class BJEnvironment(gym.Env):
 
     def reset(self):
         
-        self.actual_deck = self.game.get_deck()
-        self.actual_len = len(self.actual_deck)
-
-        if(self.actual_len >= self.deck_min_len):
-            self.game.set_deck(self.actual_deck)
-            
-        self.game = BlackjackGame()
-        self.game.start_game(self.bet)
+        if (len(self.game.get_deck()) <= self.deck_min_len):
+            self.game.regenerate_deck()
         
-
+        self.game.start_game(self.bet)
+         
         self.status = ["act", "continue"]
 
         return self.get_obs(), {}
