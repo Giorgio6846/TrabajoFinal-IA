@@ -12,11 +12,14 @@ VERSIONUPDATE = 0
 # ModelWeights:
 # Sends the weights of the array
 
+
 class Client():
     def __init__(self):
         self.port = 40674
-        self.address = "10.0.0.105"
-
+        # self.address = "10.142.81.104"
+        # self.address = "10.0.0.105"
+        self.address = "172.20.10.3"
+        
     def sendArray(self, arrayWeights):
         # Message Sent
         arrayList = self.modelWeightList(arrayWeights)
@@ -34,7 +37,7 @@ class Client():
             weight.tolist() for weight in arrayWeights["Model"].get_weights()
         ]
         return arrayToList
-        
+
     def receiveArray(self):
         # Message Sent
         inf = {"Type": 1}
@@ -73,7 +76,7 @@ class Client():
 
     def decodeMessage(self, response):
         dataDict = json.loads(response)
-        #print(dataDict)
+        # print(dataDict)
 
         responseServer = dict()        
 
