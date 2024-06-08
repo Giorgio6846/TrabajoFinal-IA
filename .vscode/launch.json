@@ -19,6 +19,13 @@
             "console": "integratedTerminal"
         },
         {
+            "name": "Debug WorkerPC",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/dataset/workspaceGame/WorkerPC.py",
+            "console": "integratedTerminal"
+        },
+        {
             "name": "Debug Main Process",
             "type": "node",
             "request": "launch",
