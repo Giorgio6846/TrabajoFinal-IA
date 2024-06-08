@@ -9,8 +9,8 @@ VERBOSETRAIN = 0
 
 class SaveModel:
     def __init__(self):
-        self.checkpointPath = "models/v{ver}/cp-{epoch:04d}.weights.h5"
-        self.modelPath = "models/v{ver}/finished_{comVer}.keras"
+        self.checkpointPath = "./models/v{ver}/cp-{epoch:04d}.weights.h5"
+        self.modelPath = "./models/v{ver}/finished_{comVer}.keras"
 
     def saveCheckpoint(self, model, VERSION, EPOCH):
         path_dir = os.path.dirname(self.checkpointPath)

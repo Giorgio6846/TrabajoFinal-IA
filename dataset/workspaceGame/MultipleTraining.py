@@ -1,6 +1,6 @@
-from Agent import DQNAgent
-from Environment import BJEnvironment
-from Tools import SaveModel
+from Blackjack.Agent import DQNAgent
+from Blackjack.Environment import BJEnvironment
+from dataset.workspaceGame.Blackjack.Tools import SaveModel
 
 VERSION = 2
 COMPLETEDVERSION = 1

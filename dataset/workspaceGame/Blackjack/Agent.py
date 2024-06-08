@@ -1,7 +1,7 @@
 from collections import deque
 import numpy as np
 import random
-from Tools import Model
+from Blackjack.Tools import Model
 import tensorflow as tf
 
 VERBOSETRAIN = 1

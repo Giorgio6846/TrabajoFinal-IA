@@ -1,6 +1,11 @@
 import tensorflow as tf
-from Tools import SaveModel, Model
+from Blackjack.Tools import SaveModel, Model
 import socket
+
+#Funcions
+# - Local Coordinator
+# - Global Coordinator
+# - Center Coordinator
 
 class Coordinator:
     def __init__(self, state_size, action_size, episodes, batch_size):

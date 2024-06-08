@@ -1,24 +1,18 @@
-from Agent import DQNAgent
-from Environment import BJEnvironment
-from Tools import SaveModel
+from Blackjack.Agent import DQNAgent
+from Blackjack.Environment import BJEnvironment
+from Blackjack.Tools import SaveModel
 
-
-VERSION = 1
-EPOCH = 1
+VERSION = 2
 COMPLETEDVERSION = 1
 
-
-
 if __name__ == "__main__":
-    EPISODES = 2500
-    state_size = 3  # player_sum, dealer_card, usable_ace
-    action_size = 3  # hit, stay, double
+    EPISODES = 50
+
     batch_size = 32
 
-    agent = DQNAgent(state_size, action_size, 0.01, EPISODES, batch_size, "./models/v{VERSION}/logs".format(VERSION=VERSION))
-    save = SaveModel()
-
     env = BJEnvironment()
+    agent = DQNAgent(env.state_size, env.action_size, 0.01, EPISODES, batch_size, "./models/v{VERSION}/logs".format(VERSION=VERSION))
+    save = SaveModel()
 
     for ep in range(EPISODES):
         if ep % 10 == 0:        

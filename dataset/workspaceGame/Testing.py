@@ -1,7 +1,10 @@
 import numpy as np
+import random
+from collections import deque
+import tensorflow as tf
 
-from blackjack import BlackjackGame
-from Tools import SaveModel, Model
+from Blackjack import BlackjackGame
+from dataset.workspaceGame.Blackjack.Tools import SaveModel, Model
 
 VERSION = 1
 COMPLETEDVERSION = 1
