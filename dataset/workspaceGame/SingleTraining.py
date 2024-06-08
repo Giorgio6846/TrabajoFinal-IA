@@ -6,7 +6,7 @@ VERSION = 2
 COMPLETEDVERSION = 1
 
 if __name__ == "__main__":
-    EPISODES = 50
+    EPISODES = 2500
 
     batch_size = 32
 
