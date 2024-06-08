@@ -5,7 +5,13 @@ import json
 class Server:
     def __init__(self, model, version):
 
-       
+        # Create socket for connections
+        self.serverSocket = socket.socket()
+        self.serverSocket.bind(("", self.port))
+
+        print("socket binded to %s" % (self.port))
+        self.serverSocket.listen(10)
+        self.print("[INFO] Server started on {}". format(self.host, self.port))
 
         self.model = model
         self.version = version
@@ -39,5 +45,4 @@ class Server:
     def send_response(self, client_socket, response):
         response_json = json.dumps(response)
         client_socket.send(response_json.encode())
-        
-    def execute_request(self, client_socket, method_funciotns)
+    

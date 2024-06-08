@@ -1,6 +1,7 @@
 # Import socket module
 import socket
 import json
+import numpy as np
 
 VERSIONUPDATE = 0
 
@@ -8,7 +9,7 @@ VERSIONUPDATE = 0
 # Type:
 # 1 - Receive new array
 # 2 - Send array
-# Arr:
+# ModelWeights:
 # Sends the weights of the array
 
 class Client():
@@ -16,18 +17,33 @@ class Client():
         self.port = 40674
         self.address = "10.0.0.105"
 
-    def sendArray(self,array):
-        inf = {"Type:": 2, "Arr": array}
+    def sendArray(self, arrayWeights):
+        # Message Sent
+        arrayList = self.modelWeightList(arrayWeights)
+        inf = {"Type": 2, "Arr": arrayList}
         ServerInf = json.dumps(inf)
 
-        response = self.connectServer(ServerInf)
+        # Message Received
+        responseServer = self.connectServer(ServerInf)
+        response = self.decodeMessage(responseServer)
+
         return response
 
+    def modelWeightList(self, arrayWeights):
+        arrayToList = [
+            weight.tolist() for weight in arrayWeights["Model"].get_weights()
+        ]
+        return arrayToList
+        
     def receiveArray(self):
-        inf = {"Type:": 1}
+        # Message Sent
+        inf = {"Type": 1}
         ServerInf = json.dumps(inf)
 
-        response = self.connectServer(ServerInf)
+        # Message Received
+        responseServer = self.connectServer(ServerInf)
+        response = self.decodeMessage(responseServer)
+
         return response
 
     def connectServer(self,jsonServer):    
@@ -54,3 +70,18 @@ class Client():
         s.close()
 
         return res
+
+    def decodeMessage(self, response):
+        dataDict = json.loads(response)
+        #print(dataDict)
+
+        responseServer = dict()        
+
+        for key, value in dataDict.items():
+            if key == "ModelWeights":
+                weights = [np.array(weight) for weight in value]
+                responseServer["ModelWeights"] = weights
+            elif key == "Version":
+                responseServer["Version"] = value
+
+        return responseServer
