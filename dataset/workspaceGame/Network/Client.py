@@ -16,9 +16,9 @@ VERSIONUPDATE = 0
 class Client():
     def __init__(self):
         self.port = 40674
-        # self.address = "10.142.81.104"
+        self.address = "10.142.81.104"
         # self.address = "10.0.0.105"
-        self.address = "172.20.10.3"
+        #self.address = "172.20.10.3"
         
     def sendArray(self, arrayWeights):
         # Message Sent
