@@ -178,6 +178,6 @@ class WorkerPC:
         self.modelCoordinator["Version"] = newModel["Version"]
         self.modelCoordinator["Model"].set_weights(newModel["ModelWeights"])
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     worker = WorkerPC(4)
     worker.factory()
