@@ -97,19 +97,24 @@ class Coordinator:
     def executeRequest(self, client_socket, data_json):
         dataDict = json.loads(data_json)
         print(dataDict)
-        
-        
+
+        valDict = 1
         for key, value in dataDict.items():
             if key == "Type":
                 if value == 1:
+                    valDict = 1
                     print("Sent model")
                     self.sendModel(client_socket)    
 
                 elif value == 2:
+                    valDict = 2
+
+            if key == "ModelWeights":
+                if valDict == 2:
                     print("Merged model")
-                    self.merge_networks()
+                    self.merge_networks(value)
                     self.sendModel(client_socket) 
-                    
+
     def sendModel(self, client_socket):
         response = dict()
         response["Version"] = self.model["Version"]
@@ -118,30 +123,24 @@ class Coordinator:
         response_json = json.dumps(response)
 
         self.send_response(client_socket, response_json)
-        
+
     def send_response(self, client_socket, response):
         response_json = json.dumps(response)
         client_socket.send(response_json.encode())
 
     def merge_networks(self, workerModelWeights):
         # Assuming net1 and net2 have the same architecture
-        if self.modelVersion % SAVEMODELAMOUNT == 0:
+        if self.model["Version"] % SAVEMODELAMOUNT == 0 and self.model["Version"] != 0:
             self.saveMainModel()
-            
 
-        newNet = tf.keras.models.clone_model(self.model)
-        newNet.build(
-            self.model.inputShape
-        )  # Build the model with the correct input shape
+        newNet = tf.keras.models.clone_model(self.model["Model"])
 
-        weights1 = self.model.get_weights()
+        weights1 = self.model["Model"].get_weights()
         weights2 = workerModelWeights
 
         newWeights = [(w1 + w2) / 2.0 for w1, w2 in zip(weights1, weights2)]
-        newNet.set_weights(newWeights)
 
-        self.model["Version"] = self.model["Version"] + 1
-        self.model["Model"] = newNet
+        self.model["Model"].set_weights(newWeights)
 
     def saveMainModel(self):
         self.saveModel.saveModel(self.model, VERSION, COMPLETEDVERSION)

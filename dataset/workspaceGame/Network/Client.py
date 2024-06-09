@@ -1,4 +1,3 @@
-# Import socket module
 import socket
 import json
 import numpy as np
@@ -22,7 +21,7 @@ class Client():
     def sendArray(self, arrayWeights):
         # Message Sent
         arrayList = self.modelWeightList(arrayWeights)
-        inf = {"Type": 2, "Arr": arrayList}
+        inf = {"Type": 2, "ModelWeights": arrayList}
         ServerInf = json.dumps(inf)
 
         # Message Received
@@ -33,7 +32,7 @@ class Client():
 
     def modelWeightList(self, arrayWeights):
         arrayToList = [
-            weight.tolist() for weight in arrayWeights["Model"].get_weights()
+            weight.tolist() for weight in arrayWeights
         ]
         return arrayToList
         
