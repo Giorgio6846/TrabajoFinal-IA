@@ -18,7 +18,7 @@ from Blackjack.Environment import BJEnvironment
 # {Version: Version of the model}
 # {ModelWeights: The weights of the model}
 
-VERSION = 2
+VERSION = 3
 COMPLETEDVERSION = 1
 
 SAVEMODELAMOUNT = 10

@@ -32,7 +32,20 @@ class SaveModel:
         return models.load_model(
             self.modelPath.format(ver=VERSION, comVer=COMPLETEDVERSION)
         )
-             
+    
+    def latestModel(self, VERSION):
+        fileExist = True
+        COMPLETEDVERSION = 1
+        
+        while fileExist:
+            if os.path.exists(self.modelPath.format(ver=VERSION, comVer=COMPLETEDVERSION)):
+                print(self.modelPath.format(ver=VERSION, comVer=COMPLETEDVERSION))
+                COMPLETEDVERSION +=1
+            else:
+                fileExist = False
+
+        return COMPLETEDVERSION
+        
 class Model:
 
     def _build_model(self, state_size, action_size):
@@ -47,7 +60,6 @@ class Model:
             opt = tf.keras.optimizers.Adam(learning_rate=0.01)
 
         model.compile(loss="mse", optimizer=opt, metrics =['accuracy'])
-
         model.summary()
     
         return model

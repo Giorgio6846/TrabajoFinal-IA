@@ -6,7 +6,6 @@ from Blackjack.Blackjack import BlackjackGame
 
 class BJEnvironment(gym.Env):
     def __init__(self):
-        super(BJEnvironment, self).__init__()
         self.game = BlackjackGame()
         self.bet = 5
         self.deck_min_len = 109
@@ -69,7 +68,6 @@ class BJEnvironment(gym.Env):
         return state
 
     def reset(self):
-        
         if (len(self.game.get_deck()) <= self.deck_min_len):
             self.game.regenerate_deck()
         

@@ -49,9 +49,9 @@ class DQNAgent:
             target = reward
             if not done:
                 target = reward + self.gamma * np.amax(
-                    self.model.predict(next_state, verbose=VERBOSETRAIN)[0]
+                    self.model.predict(next_state, verbose=VERBOSETRAIN, use_multiprocessing=True)[0]
                 )
-            target_f = self.model.predict(state, verbose=VERBOSETRAIN)
+            target_f = self.model.predict(state, verbose=VERBOSETRAIN, use_multiprocessing=True)
             target_f[0][action] = target
 
             if self.SaveToTensorboard:
@@ -60,9 +60,9 @@ class DQNAgent:
                     histogram_freq=0,
                     write_graph=True,
                 )
-                self.model.fit(state, target_f, epochs=1, verbose=VERBOSETRAIN, callbacks=callbacks)
+                self.model.fit(state, target_f, epochs=1, verbose=VERBOSETRAIN, callbacks=callbacks, use_multiprocessing=True)
             else:
-                self.model.fit(state, target_f, epochs=1, verbose=VERBOSETRAIN)
+                self.model.fit(state, target_f, epochs=1, verbose=VERBOSETRAIN, use_multiprocessing=True)
 
         if self.epsilon > self.epsilon_min:
             self.epsilon *= self.epsilon_decay
