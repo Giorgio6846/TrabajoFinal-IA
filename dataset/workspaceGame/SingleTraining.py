@@ -7,7 +7,7 @@ COMPLETEDVERSION = 1
 SAVEEVERY = 100
 
 if __name__ == "__main__":
-    EPISODES = 2500
+    EPISODES = 2600
 
     batch_size = 32
 
