@@ -1,0 +1,14 @@
+version: '3'
+
+services:
+  tensorflow:
+    image: tfstandalone:tag
+    build:
+      context: .
+      dockerfile: TFstandalone.Dockerfile
+    restart: 'always'
+    ports:
+      - '8888:8888'
+    volumes: 
+      - .\dataset:/tf/dataset:dataset
+      - .\program:/tf/program:app

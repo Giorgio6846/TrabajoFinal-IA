@@ -1,0 +1,13 @@
+version: '3'
+
+services:
+  tensorflow:
+    image: tfworker:tag
+    build:
+      context: .
+      dockerfile: TFwork.Dockerfile
+    restart: 'always'
+    ports:
+      - '8888:8888'
+    volumes: 
+      - .\dataset:/tf/dataset:dataset
