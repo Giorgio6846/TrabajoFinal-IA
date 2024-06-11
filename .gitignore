@@ -24,3 +24,4 @@ dataset/workspaceGame/.DS_Store
 /dataset/workspaceGame/Network/__pycache__
 /dataset/workspaceGame/models/v3/logs
 /dataset/workspaceGame/models/v4/logs
+/dataset/workspaceGame/models/v5/logs

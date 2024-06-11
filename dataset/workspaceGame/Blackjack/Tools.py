@@ -7,40 +7,60 @@ import platform
 
 VERBOSETRAIN = 0
 
-class SaveModel:
-    def __init__(self):
+class Model:
+    def __init__(self, state_size, action_size):
         self.checkpointPath = "./models/v{ver}/cp-{epoch:04d}.weights.h5"
         self.modelPath = "./models/v{ver}/finished_{comVer}.keras"
         if 'TERM_PROGRAM' in os.environ.keys() and os.environ['TERM_PROGRAM'] == 'vscode':
             self.checkpointPath = "./dataset/workspaceGame/models/v{ver}/cp-{epoch:04d}.weights.h5"
             self.modelPath = "./dataset/workspaceGame/models/v{ver}/finished_{comVer}.keras"
 
+        self.state_size = state_size
+        self.action_size = action_size
+        self.model = 0
+        self._build_model()
 
-    def saveCheckpoint(self, model, VERSION, EPOCH):
-        path_dir = os.path.dirname(self.checkpointPath)
+    def _build_model(self):
+        self.model = models.Sequential()
+        self.model.add(Input(shape = [self.state_size], dtype = 'uint8'))
+        self.model.add(layers.Dense(128, activation="relu"))
+        self.model.add(layers.Dense(self.action_size, activation="linear"))
 
-        model.save_weights(self.checkpointPath.format(ver=VERSION, epoch=EPOCH))
+        if platform.system() == "Darwin" and platform.processor() == "arm":
+            opt = tf.keras.optimizers.legacy.Adam(learning_rate=0.01)
+        else:
+            opt = tf.keras.optimizers.Adam(learning_rate=0.01)
 
-    def loadCheckpoint(self, model, VERSION, EPOCH):
-        path_dir = os.path.dirname(self.checkpointPath)
-        return model.load_weights(self.checkpointPath.format(ver=VERSION, epoch=EPOCH))
+        self.model.compile(loss="mse", optimizer=opt, metrics =['accuracy'])
+        self.model.summary()
 
-    def saveModel(self, model, VERSION, COMPLETEDVERSION):
-        path_dir = os.path.dirname(self.modelPath)
+    def act(self, state, epsilon, action_size):
+        if np.random.rand() <= epsilon:
+            return random.randrange(action_size)
+        return self.predict(state)
 
-        model.save(self.modelPath.format(ver=VERSION, comVer=COMPLETEDVERSION))
+    def remember(self, state, action, reward, next_state, done, memory):
+        memory.append((state, action, reward, next_state, done))
 
-    def loadModel(self, VERSION, COMPLETEDVERSION):
-        path_dir = os.path.dirname(self.modelPath)
-
-        return models.load_model(
-            self.modelPath.format(ver=VERSION, comVer=COMPLETEDVERSION)
-        )
+    def predict(self, state):
+        return np.argmax(self.model.predict(state, verbose=VERBOSETRAIN, use_multiprocessing=True)[0])
     
-    def latestModel(self, VERSION):
+    def loadModel(self, VERSION, COMPLETEDVERSION):
+        self.model = models.load_model(self.model.format(ver=VERSION, comVer=COMPLETEDVERSION))
+
+    def saveModel(self, VERSION, COMPLETEDVERSION):
+        self.model.save(self.modelPath.format(ver=VERSION, comVer=COMPLETEDVERSION))
+
+    def loadCheckpoint(self, VERSION, EPOCH):
+        self.model = models.load_weights(self.checkpointPath.format(ver=VERSION, epoch=EPOCH))
+
+    def saveCheckpoint(self, VERSION, EPOCH):
+        self.model.save_weights(self.checkpointPath.format(ver=VERSION, epoch=EPOCH))
+
+    def getFinalLatestVersion(self, VERSION):
         fileExist = True
         COMPLETEDVERSION = 1
-        
+
         while fileExist:
             if os.path.exists(self.modelPath.format(ver=VERSION, comVer=COMPLETEDVERSION)):
                 print(self.modelPath.format(ver=VERSION, comVer=COMPLETEDVERSION))
@@ -49,30 +69,18 @@ class SaveModel:
                 fileExist = False
 
         return COMPLETEDVERSION
-        
-class Model:
 
-    def _build_model(self, state_size, action_size):
-        model = models.Sequential()
-        model.add(Input(shape = [state_size], dtype = 'uint8'))
-        model.add(layers.Dense(64, activation="relu"))
-        model.add(layers.Dense(action_size, activation="linear"))
-        
-        if platform.system() == "Darwin" and platform.processor() == "arm":
-            opt = tf.keras.optimizers.legacy.Adam(learning_rate=0.01)
-        else:
-            opt = tf.keras.optimizers.Adam(learning_rate=0.01)
+    def getCheckpointLatestVersion(self, VERSION):
+        fileExist = True
+        COMPLETEDVERSION = 1
 
-        model.compile(loss="mse", optimizer=opt, metrics =['accuracy'])
-        model.summary()
-    
-        return model
+        while fileExist:
+            if os.path.exists(
+                self.checkpointPath.format(ver=VERSION, epoch=COMPLETEDVERSION)
+            ):
+                print(self.checkpointPath.format(ver=VERSION, epoch=COMPLETEDVERSION))
+                COMPLETEDVERSION += 1
+            else:
+                fileExist = False
 
-    def act(self, state, epsilon, action_size, model):
-        if np.random.rand() <= epsilon:
-            return random.randrange(action_size)
-        act_values = model.predict(state, verbose=VERBOSETRAIN)
-        return np.argmax(act_values[0])
-
-    def remember(self, state, action, reward, next_state, done, memory):
-        memory.append((state, action, reward, next_state, done))
+        return COMPLETEDVERSION
