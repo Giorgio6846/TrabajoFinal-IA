@@ -1,2 +1,4 @@
 zmq
 networkx
+ultralytics
+opencv-python

@@ -2,6 +2,8 @@ version: "3"
 
 services:
   tensorflow:
+    environment:
+      - PYTHONUNBUFFERED=1
     image: tfstandalone:tag
     build:
       context: .
