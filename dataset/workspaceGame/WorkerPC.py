@@ -12,7 +12,7 @@ from Blackjack.Agent import DQNAgent
 from Blackjack.Environment import BJEnvironment
 from Network.Client import Client
 
-VERSION = 3
+VERSION = 8
 COMPLETEDVERSION = 1
 MINIEPISODES = 50
 
@@ -22,7 +22,7 @@ class WorkerPC:
         self.batch_size = 32
 
         env = BJEnvironment()
-        ModelClass = Model()
+        self.ModelClass = Model(env.state_size, env.action_size)
 
         # Handle Network Operations with Coordinator
         self.Network = Client()
@@ -39,14 +39,12 @@ class WorkerPC:
         # MNU - Model not uploaded to main coordinator after changes made with workers
         # MU  - It has the lastest version that was grabbed from the coordinator
         # Weights of the model from the worker
-        #self.workerInf = {}
+        # self.workerInf = {}
 
         # Data sent to process
         self.modelCoordinator = dict()
 
-        self.modelCoordinator["Model"] = ModelClass._build_model(
-            env.state_size, env.action_size
-        )
+        self.modelCoordinator["Model"] = tf.keras.models.clone_model(self.ModelClass.model)
         self.modelCoordinator["Version"] = 0
 
         # Status
@@ -57,7 +55,7 @@ class WorkerPC:
         self.managerWorker = Manager()
 
         self.initWorkers()
-    
+
     def start(self):
         factoryThread = threading.Thread(target = self.factory)
         factoryThread.start()
@@ -77,8 +75,6 @@ class WorkerPC:
                 ),
             )
 
-            self.workersHome[index].start()
-            
     def merge_networks(self, newModel):
         # Assuming net1 and net2 have the same architecture
         newNet = tf.keras.models.clone_model(self.modelCoordinator["Model"])
@@ -120,7 +116,10 @@ class WorkerPC:
             if Array[0] == "Stop":
                 break
 
-    def factory(self):               
+    def factory(self):      
+        for index in range(self.Procc):
+            self.workersHome[index].start()
+
         while True:
             for index in range(self.Procc):
                 if self.workerInf[index][0] == "Finished":
@@ -139,7 +138,6 @@ class WorkerPC:
                 self.updateModel(newModel)
 
                 self.modelCoordinator["Status"] = "MU"
-                
 
             elif self.modelCoordinator["Status"] == "MNU":
                 newModel = self.Network.sendArray(self.modelCoordinator["Model"].get_weights())
@@ -150,7 +148,7 @@ class WorkerPC:
                         self.workerInf[index][2] = self.modelCoordinator["Model"].get_weights()
                         self.workerInf[index][1] = "MU"
 
-                self.modelCoordinator = "MU"
+                self.modelCoordinator["Status"] = "MU"
 
             elif self.modelCoordinator["Status"] == "MU":
                 # See if the model is updated if that so
@@ -165,5 +163,5 @@ class WorkerPC:
         self.modelCoordinator["Model"].set_weights(newModel["ModelWeights"])
 
 if __name__ == '__main__':
-    worker = WorkerPC(4)
+    worker = WorkerPC(1)
     worker.start()

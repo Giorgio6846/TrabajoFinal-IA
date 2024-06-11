@@ -5,7 +5,7 @@ import threading
 import json
 import numpy as np
 
-from Blackjack.Tools import SaveModel, Model
+from Blackjack.Tools import Model
 from Blackjack.Environment import BJEnvironment
 
 # Types of JSON Coordinator to Send
@@ -26,9 +26,7 @@ SAVEMODELAMOUNT = 10
 class Coordinator:
     def __init__(self):
         env = BJEnvironment()
-
-        self.modelCreate = Model()
-        self.saveModel = SaveModel()
+        self.ModelClass = Model(env.state_size, env.action_size)
 
         self.host = ""
         self.buffer_size = 30_000_000
@@ -36,7 +34,7 @@ class Coordinator:
 
         self.model = dict()
 
-        self.model["Model"] = self.modelCreate._build_model(env.state_size, env.action_size)
+        self.model["Model"] = tf.keras.models.clone_model(self.ModelClass.model)
         self.model["Version"] = 0
 
         # Create socket for connections
@@ -75,7 +73,6 @@ class Coordinator:
 
         while True:
             try:
-
                 pass
             except KeyboardInterrupt:
                 break
@@ -132,8 +129,6 @@ class Coordinator:
         # Assuming net1 and net2 have the same architecture
         if self.model["Version"] % SAVEMODELAMOUNT == 0 and self.model["Version"] != 0:
             self.saveMainModel()
-
-        newNet = tf.keras.models.clone_model(self.model["Model"])
 
         weights1 = self.model["Model"].get_weights()
         weights2 = workerModelWeights
