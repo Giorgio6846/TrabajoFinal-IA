@@ -3,14 +3,12 @@
   <head>
     <title>Proyecto Inteligencia Artificial</title>
     <link rel="stylesheet" type="text/css" href="../styles/form.css" />
-    <script src="../serverConnection/connect.js"></script>
   </head>
 
   <body>
     <h1>Proyecto Inteligencia Artificial</h1>
     <section>
       <button id="screenshotBtn">Take Screenshot</button> <br />
-      <img id="screenshot" src="" alt="Screenshot will appear here" />
     </section>
     <section class="form">
       <form action="./mainPage" method="post">
@@ -49,11 +47,6 @@
         <input type="submit" class="startProgram" value="Iniciar programa" />
       </form>
     </section>
-    <script>
-      document.getElementById("screenshotBtn").addEventListener("click", () => {
-        sendImageToServer(`../screenshots/screenshot-1.jpg`);
-      });
-    </script>
     <script src="../scripts/mouseDetector.js"></script>
     <script src="../scripts/manageScreenshot.js"></script>
   </body>

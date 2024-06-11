@@ -5,7 +5,7 @@ services:
     image: tfstandalone:tag
     build:
       context: .
-      dockerfile: TFstandalone.Dockerfile
+      dockerfile: TFstandaloneServer.Dockerfile
     restart: "always"
     ports:
       - "8888:8888"

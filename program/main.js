@@ -3,8 +3,6 @@ const { app, BrowserWindow, ipcMain, Menu } = require("electron");
 const path = require("path");
 const screenshot = require("screenshot-desktop");
 
-contador = 0;
-
 const createWindow = () => {
   mainWindow = new BrowserWindow({
     width: 1200,
@@ -71,12 +69,10 @@ app.on("window-all-closed", () => {
 
 ipcMain.handle("take-screenshot", async () => {
   try {
-    contador = contador + 1;
-    const timestamp = Date.now();
     const imgPath = path.join(
       __dirname,
       "/screenshots",
-      `screenshot-${contador}.jpg`
+      `screenshot-1.jpg`
     );
     await screenshot({ filename: imgPath });
     return imgPath;
