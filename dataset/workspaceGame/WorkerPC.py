@@ -1,9 +1,11 @@
 # Thanks to a certain person
+from concurrent.futures import thread
 from multiprocessing import managers
 from multiprocess import Process, Manager
 from multiprocess.managers import BaseManager
 from time import sleep
 import tensorflow as tf
+import threading
 
 from Blackjack.Tools import Model
 from Blackjack.Agent import DQNAgent
@@ -55,6 +57,10 @@ class WorkerPC:
         self.managerWorker = Manager()
 
         self.initWorkers()
+    
+    def start(self):
+        factoryThread = threading.Thread(target = self.factory)
+        factoryThread.start()
 
     def initWorkers(self):
         self.workerInf =self.managerWorker.dict()
@@ -89,7 +95,7 @@ class WorkerPC:
     # Models: Where the workers store their models
     # ModelState: The state of the model of the factory to renew the model of the worker
 
-    def training(self, Index, BatchSize, Episodes, Array):        
+    def training(self, Index, BatchSize, Episodes, Array):           
         env = BJEnvironment()
         agent = DQNAgent(
             env.state_size, env.action_size, 0.01, BatchSize, VERSION
@@ -114,7 +120,7 @@ class WorkerPC:
             if Array[0] == "Stop":
                 break
 
-    def factory(self):        
+    def factory(self):               
         while True:
             for index in range(self.Procc):
                 if self.workerInf[index][0] == "Finished":
@@ -160,4 +166,4 @@ class WorkerPC:
 
 if __name__ == '__main__':
     worker = WorkerPC(4)
-    #worker.factory()
+    worker.start()

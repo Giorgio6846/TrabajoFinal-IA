@@ -7,7 +7,6 @@ VERSION = 1
 COMPLETEDVERSION = 1
 VERBOSETRAIN = 1
 
-
 class Test:
     def __init__(self, model):
         self.ModelClass = Model()

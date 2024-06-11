@@ -2,14 +2,14 @@ from Blackjack.Agent import DQNAgent
 from Blackjack.Environment import BJEnvironment
 from Blackjack.Tools import SaveModel
 
-VERSION = 2
+VERSION = 4
 COMPLETEDVERSION = 1
-SAVEEVERY = 100
+SAVEEVERY = 250
 
 if __name__ == "__main__":
-    EPISODES = 2600
+    EPISODES = 4500
 
-    batch_size = 32
+    batch_size = 128
 
     env = BJEnvironment()
     agent = DQNAgent(env.state_size, env.action_size, 0.01, batch_size, VERSION)
