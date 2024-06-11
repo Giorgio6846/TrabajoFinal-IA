@@ -3,6 +3,7 @@
   <head>
     <title>Proyecto Inteligencia Artificial</title>
     <link rel="stylesheet" type="text/css" href="../styles/form.css" />
+    <script src="../serverConnection/connect.js"></script>
   </head>
 
   <body>
@@ -48,7 +49,11 @@
         <input type="submit" class="startProgram" value="Iniciar programa" />
       </form>
     </section>
-
+    <script>
+      document.getElementById("screenshotBtn").addEventListener("click", () => {
+        sendImageToServer(`../screenshots/screenshot-1.jpg`);
+      });
+    </script>
     <script src="../scripts/mouseDetector.js"></script>
     <script src="../scripts/manageScreenshot.js"></script>
   </body>

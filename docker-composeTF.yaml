@@ -1,4 +1,4 @@
-version: '3'
+version: "3"
 
 services:
   tensorflow:
@@ -6,9 +6,11 @@ services:
     build:
       context: .
       dockerfile: TFstandalone.Dockerfile
-    restart: 'always'
+    restart: "always"
     ports:
-      - '8888:8888'
-    volumes: 
+      - "8888:8888"
+      - "5555:5555"
+    volumes:
       - .\dataset:/tf/dataset:dataset
       - .\program:/tf/program:app
+      - .\server:/tf/server:app
