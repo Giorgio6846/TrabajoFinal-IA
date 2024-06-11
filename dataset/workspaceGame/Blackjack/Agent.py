@@ -16,7 +16,6 @@ class DQNAgent:
         batch_size=32,
         VERSION = 1
     ):
-
         self.ModelClass = Model()
 
         #Model Parameters        
@@ -91,7 +90,7 @@ class DQNAgent:
         self.SaveToTensorboard = STT
 
         done = False
-        env.reset()
+        env.reset(5)
 
         while not done:
             obs = env.get_obs()

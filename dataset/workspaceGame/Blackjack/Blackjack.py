@@ -13,6 +13,7 @@ class BlackjackGame:
         "spades": spade,
         "clubs": club
     }
+    
     #inicializacion de las variables de juego
     def __init__(self):
         self.deck = self.generate_deck()
@@ -25,7 +26,6 @@ class BlackjackGame:
 
     def get_deck(self):
         return self.deck
-
 
     def set_deck(self, new_deck):
         self.deck = new_deck
@@ -46,6 +46,7 @@ class BlackjackGame:
 
     #fucion para empezar el juego, donde se crean las manos de los jugadores
     def start_game(self, bet):
+        self.firstTurn = True
         self.player_hand = [self.deal_card(), self.deal_card()]
         self.dealer_hand = [self.deal_card(), self.deal_card()]
         self.bet_game = bet #se incializa la variable apuesta que es introducida como un parametro
@@ -73,6 +74,7 @@ class BlackjackGame:
 
     #todas las acciones que puede realizar el jugador
     def player_action(self, action):
+        self.firstTurn = False
         #"Hit" automaticamente se introduce una carta de la baraja a la mano del jugador y se borra una carta del array del mazo.
         if action == "hit":
             self.player_hand.append(self.deal_card())
