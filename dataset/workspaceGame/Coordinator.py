@@ -18,10 +18,15 @@ from Blackjack.Environment import BJEnvironment
 # {Version: Version of the model}
 # {ModelWeights: The weights of the model}
 
+<<<<<<< Updated upstream
 VERSION = 4
 COMPLETEDVERSION = 1
 
 SAVEMODELAMOUNT = 2
+=======
+VERSION = 3
+SAVECHECKPOINTEVERY = 2
+>>>>>>> Stashed changes
 
 class Coordinator:
     def __init__(self):
@@ -45,6 +50,7 @@ class Coordinator:
         self.serverSocket.listen(10)
         print("[INFO] Server started on {}".format(self.host, self.port))
 
+<<<<<<< Updated upstream
         self.VERSION = VERSION
         self.COMPLETEDVERSION = 1
 
@@ -52,6 +58,12 @@ class Coordinator:
 
         if self.COMPLETEDVERSION != 1:
             self.ModelClass.loadModel(self.VERSION, self.COMPLETEDVERSION - 1)
+=======
+        self.completedVersion = self.ModelClass.getFinalLatestVersion(VERSION)
+        self.epoch = 1
+        
+        self.loadMainModel()
+>>>>>>> Stashed changes
 
     # Server Functions
     def startServer(self):
@@ -137,7 +149,10 @@ class Coordinator:
 
     def merge_networks(self, workerModelWeights):
         # Assuming net1 and net2 have the same architecture
-        if self.model["Version"] % SAVEMODELAMOUNT == 0 and self.model["Version"] != 0:
+        if (
+            self.model["Version"] % SAVECHECKPOINTEVERY == 0
+            and self.model["Version"] != 0
+        ):
             self.saveMainModel()
 
         weights1 = self.model["Model"].get_weights()
@@ -148,10 +163,33 @@ class Coordinator:
         self.model["Model"].set_weights(newWeights)
         self.model["Version"] = self.model["Version"] + 1
 
+    def copyModel(self):
+        self.ModelClass = tf.keras.models.clone_model(self.model["Model"])
+
+    def loadMainModel(self):
+        self.copyModel()
+
+        if self.completedVersion != 1:
+            self.ModelClass.loadModel(VERSION, self.completedVersion-1)
+
     def saveMainModel(self):
+<<<<<<< Updated upstream
         self.ModelClass.saveModel(self.VERSION, self.COMPLETEDVERSION)
         self.COMPLETEDVERSION = COMPLETEDVERSION + 1
+=======
+        self.copyModel()
+
+        self.ModelClass.saveModel(VERSION, self.completedVersion)
+        self.completedVersion = self.completedVersion + 1
+
+    def saveCheckpoint(self):
+        self.copyModel()
+
+        self.ModelClass.saveCheckpoint(VERSION, self.completedVersion, self.epoch)
+        self.epoch = self.epoch + 1
+>>>>>>> Stashed changes
 
 if __name__ == "__main__":
     Coord = Coordinator()
+    Coord.ModelClass.saveStatus(2, VERSION)
     Coord.start()

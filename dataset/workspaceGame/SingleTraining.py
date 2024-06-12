@@ -1,9 +1,7 @@
-from distutils.version import Version
 from Blackjack.Agent import DQNAgent
 from Blackjack.Environment import BJEnvironment
-from Blackjack.Tools import Model
 
-VERSION = 1
+VERSION = 3
 COMPLETEDVERSION = 1
 EPOCH = 1
 SAVEEVERY = 250
@@ -11,7 +9,7 @@ SAVEEVERY = 250
 SAVETOTENSORBOARD = False
 
 if __name__ == "__main__":
-    EPISODES = 2000
+    EPISODES = 1500
     batch_size = 128
 
     env = BJEnvironment()
@@ -21,6 +19,8 @@ if __name__ == "__main__":
     
     if COMPLETEDVERSION != 1:
         agent.ModelClass.loadModel(VERSION, COMPLETEDVERSION-1)
+        
+    agent.ModelClass.saveStatus(1, VERSION)
         
     for ep in range(EPISODES):
         if ep % 10 == 0:        

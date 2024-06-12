@@ -13,8 +13,7 @@ from Blackjack.Environment import BJEnvironment
 from Network.Client import Client
 
 VERSION = 8
-COMPLETEDVERSION = 1
-MINIEPISODES = 50
+MINIEPISODES = 200
 
 class WorkerPC:
     def __init__(self, Num_Process=4):
@@ -186,5 +185,10 @@ class WorkerPC:
         self.modelCoordinator["Model"].set_weights(newModel["ModelWeights"])
 
 if __name__ == '__main__':
+<<<<<<< Updated upstream
     worker = WorkerPC(6)
     worker.start()
+=======
+    worker = WorkerPC(1)
+    worker.start()
+>>>>>>> Stashed changes
