@@ -45,6 +45,14 @@ class Coordinator:
         self.serverSocket.listen(10)
         print("[INFO] Server started on {}".format(self.host, self.port))
 
+        self.VERSION = VERSION
+        self.COMPLETEDVERSION = COMPLETEDVERSION
+
+        COMPLETEDVERSION = self.ModelClass.getFinalLatestVersion(VERSION)
+
+        if COMPLETEDVERSION != 1:
+            self.ModelClass.loadModel(VERSION, COMPLETEDVERSION - 1)
+
     # Server Functions
     def startServer(self):
         while True:
@@ -141,8 +149,8 @@ class Coordinator:
         self.model["Version"] = self.model["Version"] + 1
 
     def saveMainModel(self):
-        self.ModelClass.saveModel(VERSION, COMPLETEDVERSION)
-        COMPLETEDVERSION = COMPLETEDVERSION + 1
+        self.ModelClass.saveModel(self.VERSION, self.COMPLETEDVERSION)
+        self.COMPLETEDVERSION = COMPLETEDVERSION + 1
 
 if __name__ == "__main__":
     Coord = Coordinator()
