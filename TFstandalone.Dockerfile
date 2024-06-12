@@ -13,6 +13,7 @@ RUN pip install jupyter
 
 RUN pip install tf-models-official
 
+WORKDIR /tf/
 COPY ./requirements.txt /tf/
 COPY ./server/requirements.txt /tf/server/
 

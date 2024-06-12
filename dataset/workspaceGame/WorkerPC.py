@@ -1,70 +1,92 @@
-#Thanks to a certain person
+# Thanks to a certain person
+from concurrent.futures import thread
+from multiprocessing import managers, set_start_method
 from multiprocess import Process, Manager
+from multiprocess.managers import BaseManager
 from time import sleep
 import tensorflow as tf
+import threading
 
 from Blackjack.Tools import Model
 from Blackjack.Agent import DQNAgent
 from Blackjack.Environment import BJEnvironment
 from Network.Client import Client
 
-VERSION = 2
+VERSION = 8
 COMPLETEDVERSION = 1
 MINIEPISODES = 50
 
 class WorkerPC:
-    def __init__(self, Num_Process = 4):
+    def __init__(self, Num_Process=4):
         self.Procc = Num_Process
-        self.batch_size = 32
-        self.manager = Manager()
+        self.batch_size = 200
 
         env = BJEnvironment()
-        ModelClass = Model()
+        self.ModelClass = Model(env.state_size, env.action_size)
 
-        #Handle Network Operations with Coordinator
+        # Handle Network Operations with Coordinator
         self.Network = Client()
-        
-        # Dictionary of workers
-        self.workersHome = {}
 
-        #It is going to upload the model to the main coordinator
-        #Status 
-        
-        #MNI - Model not Installed
-        #MNU - Model not uploaded to main coordinator after changes made with workers
-        #MU - It has the version that was grabbed from the coordinator
-        
-        self.modelUpdated = "MNI"
-        
-        self.modelCoordinator = dict()
-        self.modelCoordinator["Model"] = ModelClass._build_model(env.state_size, env.action_size)
-        self.modelCoordinator["Version"] = 0
+        # Dictionary of workers process
+        self.workersHome = {}
+        self.workersCommunication = {}
+
+        # Dictionary of the workers information
+        # Status of the worker
         # Waiting, Working, Finished
-        self.statusWorkers = self.manager.dict()
-        # Dictionary in which the models are stored
-        self.models = self.manager.dict()
+        # Status of the model from the worker
+        # MNI - Model not Installed from coordinator
+        # MNU - Model not uploaded to main coordinator after changes made with workers
+        # MU  - It has the lastest version that was grabbed from the coordinator
+        # Weights of the model from the worker
+        # self.workerInf = {}
+
+        # Data sent to process
+        self.modelCoordinator = dict()
+
+        self.modelCoordinator["Model"] = tf.keras.models.clone_model(self.ModelClass.model)
+        self.modelCoordinator["Version"] = 0
+
+        # Status
+        # MNI - Model not Installed from coordinator
+        # MNU - Model not uploaded to main coordinator after changes made with workers
+        # MU  - It has the lastest version that was grabbed from the coordinator
+        self.modelCoordinator["Status"] = "MNI"
+        self.managerWorker = Manager()
+
+        set_start_method("spawn", force = True)
 
         self.initWorkers()
 
-    def initWorkers(self):
-        for index in range(self.Procc):
-            self.statusWorkers[index] = "Waiting"
-            self.models[index] = 1
+    def start(self):
+        factoryThread = threading.Thread(target = self.factory)
+        factoryThread.start()
 
-            self.workersHome[index] = Process(target=self.training, args=(index, MINIEPISODES, self.statusWorkers, self.models, self.modelUpdated))
-            self.workersHome[index].start()
+    def initWorkers(self):
+        self.workerInf = self.managerWorker.dict()
+        for index in range(self.Procc):
+            self.workerInf[index] = ["Waiting", self.modelCoordinator["Status"], self.modelCoordinator["Model"].get_weights()]
+
+            self.workersHome[index] = Process(
+                target=self.training,
+                args=(
+                    index,
+                    self.batch_size,
+                    MINIEPISODES,
+                    self.workerInf,
+                    VERSION
+                ),
+            )
 
     def merge_networks(self, newModel):
-       
         # Assuming net1 and net2 have the same architecture
-        newNet = tf.keras.models.clone_model(self.model)
-        weights1 = self.model.get_weights()
+        newNet = tf.keras.models.clone_model(self.modelCoordinator["Model"])
+        weights1 = self.modelCoordinator["Model"].get_weights()
         weights2 = newModel
 
         newWeights = [(w1 + w2) / 2.0 for w1, w2 in zip(weights1, weights2)]
-        newNet.set_weights(newWeights)
 
-        self.modelCoordinator = newNet
+        self.modelCoordinator["Model"].set_weights(newWeights)
 
     # Index: The index of the device
     # Episodes: Amount of episodes for the process to train
@@ -72,70 +94,97 @@ class WorkerPC:
     # Models: Where the workers store their models
     # ModelState: The state of the model of the factory to renew the model of the worker
 
-    def training(self, Index, Episodes, Status, Models, ModelState):        
+    def training(self, Index, BatchSize, Episodes, WorkerInf, VERSION):           
+        from Blackjack.Agent import DQNAgent
+        from Blackjack.Environment import BJEnvironment
+
         env = BJEnvironment()
-        agent = DQNAgent(env.state_size, env.action_size, VERSION, 0.01, self.batch_size)
+        agent = DQNAgent(
+            env.state_size, env.action_size, 0.01, BatchSize, VERSION
+        )
 
         while True:
-            if Status[Index] == "Waiting":
-                Status[Index] = "Working"
+            Array = WorkerInf[Index]
 
-                if ModelState == "MU":
-                    agent.model = Models[Index]              
+            if Array[0] == "Waiting":
+                Array[0] = "Working"
+
+                if Array[1] == "MU":
+                    agent.ModelClass.model.set_weights(Array[2])
 
                 for Episode in range(Episodes):
-                    print("Process {Process} in episode: {Episode}".format(Process=Index, Episode=Episode))
+                    print(f"Process {Index} in episode: {Episode}")
                     agent.train(env, False)
 
-                Models[Index] = agent.model
-                Status[Index] = "Finished"
+                Array[1] = agent.ModelClass.model.get_weights()
+                Array[0] = "Finished"
+                print(Array[0], "Worker {index} finished".format(index = Index))
 
-            if Status[Index] == "Stop":
+            WorkerInf[Index] = Array
+
+            if Array[0] == "Stop":
                 break
-            
-            sleep(1)
 
-    def factory(self):
-        workersFinished = False
+    def factory(self):      
+        modelModifiedFromCoord = False
+        
+        for index in range(self.Procc):
+            self.workersHome[index].start()
 
         while True:
-
             for index in range(self.Procc):
-                if self.statusWorkers[index] == "Finished":
-                    print("Process {index} has finished".format(index= index))
-                    print(self.models[index].get_weights())
-            
+                if self.workerInf[index][0] == "Finished":
+                    print(f"Process {index} has finished")
+                    print(self.workerInf[index][2])
             sleep(1)
-            
-            workersFinished = True
-            for index in range(self.Procc):
-                if self.statusWorkers[index] == "Working":
-                    workersFinished = False
-                elif self.statusWorkers[index] == "Waiting":
-                    workersFinished =  False
-            
-            if self.modelUpdated == "MNI":
-                #DownloadModelFromCoord
-                newMod = self.Network.receiveArray()
-                
-                self.modelCoordinator["Version"] = newMod["Version"]
-                self.modelCoordinator["Model"] = self.modelCoordinator["Model"].set_weights(newMod["ModelWeights"])
-                self.modelUpdated = "MU"
 
-            elif self.modelUpdated == "MNU":
-                #See if all the workers have finished
-                #Upload model
-                newMod = Client.sendArray(self.modelCoordinator["Model"].get_weights())
+            workersFinished = all(self.workerInf[index][0] == "Finished" for index in range(self.Procc))
+            workersWaiting = all(
+                self.workerInf[index][0] == "Waiting" for index in range(self.Procc)
+            )
 
-                self.modelCoordinator["Version"] = newMod["Version"]
-                self.modelCoordinator["Model"] = self.modelCoordinator["Model"].set_weights(newMod["ModelWeights"])
+            if self.modelCoordinator["Status"] == "MNI":
+                # DownloadModelFromCoord
+                newModel = self.Network.receiveArray()
+                self.updateModel(newModel)
+
+                self.modelCoordinator["Status"] = "MU"
+
+            elif self.modelCoordinator["Status"] == "MNU":   
+                if modelModifiedFromCoord:             
+                  newModel = self.Network.sendArray(self.modelCoordinator["Model"].get_weights(), self.modelCoordinator["Version"])
+                  self.updateModel(newModel)
                 
-            elif self.modelUpdated == "MU":
-                #See if the model is updated if that so
+                if workersWaiting == True:
+                    for index in range(self.Procc):
+                        Array = self.workerInf[index]
+
+                        Array[2] = self.modelCoordinator["Model"].get_weights()
+                        Array[1] = "MU"
+
+                        self.workerInf[index] = Array
+
+                modelModifiedFromCoord = False
+                self.modelCoordinator["Status"] = "MU"
+
+            elif self.modelCoordinator["Status"] == "MU":
+                # See if the model is updated if that so
                 if workersFinished == True:
                     for index in range(self.Procc):
-                        self.merge_networks(self.models[index])
-            
-if __name__ == "__main__": 
-    worker = WorkerPC(4)
-    worker.factory()
+                        Array = self.workerInf[index]
+
+                        self.merge_networks(Array[2])
+                        modelModifiedFromCoord = True
+                        Array[0] = "Waiting"
+
+                        self.workerInf[index] = Array
+
+                    self.modelCoordinator["Status"] = "MNU"
+
+    def updateModel(self, newModel):
+        self.modelCoordinator["Version"] = newModel["Version"]
+        self.modelCoordinator["Model"].set_weights(newModel["ModelWeights"])
+
+if __name__ == '__main__':
+    worker = WorkerPC(2)
+    worker.start()

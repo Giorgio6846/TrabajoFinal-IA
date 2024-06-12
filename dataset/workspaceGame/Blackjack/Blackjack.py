@@ -1,7 +1,7 @@
 import random
 
 class BlackjackGame:
-    
+
     heart = "\u2665"
     spade = "\u2660"
     diamond = "\u2666"
@@ -13,7 +13,8 @@ class BlackjackGame:
         "spades": spade,
         "clubs": club
     }
-    #inicializacion de las variables de juego
+
+    # inicializacion de las variables de juego
     def __init__(self):
         self.deck = self.generate_deck()
         random.shuffle(self.deck)
@@ -22,10 +23,10 @@ class BlackjackGame:
         self.current_hand_index = 0 
         self.player_hand = []
         self.dealer_hand = []
+        self.status = 0
 
     def get_deck(self):
         return self.deck
-
 
     def set_deck(self, new_deck):
         self.deck = new_deck
@@ -44,15 +45,18 @@ class BlackjackGame:
     def deal_card(self):
         return self.deck.pop()
 
-    #fucion para empezar el juego, donde se crean las manos de los jugadores
+    # fucion para empezar el juego, donde se crean las manos de los jugadores
     def start_game(self, bet):
+        self.firstTurn = True
         self.player_hand = [self.deal_card(), self.deal_card()]
         self.dealer_hand = [self.deal_card(), self.deal_card()]
         self.bet_game = bet #se incializa la variable apuesta que es introducida como un parametro
         self.splitted_hands = []  
         self.current_hand_index = 0
+        self.status = 0
+        self.badMove = False
 
-    #Funcion para obtener el valor de la mano del jugador.
+    # Funcion para obtener el valor de la mano del jugador.
     @staticmethod
     def hand_value(hand):
         value = 0
@@ -71,15 +75,18 @@ class BlackjackGame:
             aces -= 1
         return value
 
-    #todas las acciones que puede realizar el jugador
+    # todas las acciones que puede realizar el jugador
     def player_action(self, action):
-        #"Hit" automaticamente se introduce una carta de la baraja a la mano del jugador y se borra una carta del array del mazo.
+        self.badMove = False
+        self.firstTurn = False
+        # "Hit" automaticamente se introduce una carta de la baraja a la mano del jugador y se borra una carta del array del mazo.
         if action == "hit":
             self.player_hand.append(self.deal_card())
         # "Double" cuando se dobla el tamaño de la apuesta, pero solo se obtiene una carta mas y la accion pasa a automaticamente a "stay"
         elif action == "double":
             self.bet_game *= 2
             self.player_hand.append(self.deal_card())
+            self.state = 2
             action = "stay"
         # "Split" divide la mano del jugador en 2, doblando la apuesta (solo aplica cuando la mano del jugador cuenta con 2 cartas del mismo numero)
         elif action == "split":
@@ -89,23 +96,25 @@ class BlackjackGame:
                 self.player_hand.append(self.deal_card())
                 self.splitted_hands[1].append(self.deal_card())
                 self.bet_game *= 2
+                self.state = 1
             else:
                 print("El split solo es permitido con 2 cartas del mismo valor en la mano")
+                self.badMove = True
         return action, self.game_status()
-    
-    #funcion para retornar el valor de la apuesta, en caso de que se doble o se haga split.  
+
+    # funcion para retornar el valor de la apuesta, en caso de que se doble o se haga split.
     def return_bounty(self, bet, action):
         if(action == "double"):
             return bet*2
         return bet
 
-    #se hace la funcion para que el dealer tome cartas en caso de que la suma de su mano sea menor a 17
+    # se hace la funcion para que el dealer tome cartas en caso de que la suma de su mano sea menor a 17
     def dealer_action(self):
         while self.hand_value(self.dealer_hand) < 17:
             self.dealer_hand.append(self.deal_card())
             print("Dealer hits and has:", self.format_cards(self.dealer_hand), self.hand_value(self.dealer_hand))
 
-    #se confirma si el jugador obtuvo 21, o voló
+    # se confirma si el jugador obtuvo 21, o voló
     def game_status(self):
         player_value = self.hand_value(self.player_hand)
         if player_value > 21:
@@ -115,7 +124,7 @@ class BlackjackGame:
         else:
             return "continue"
 
-    # Se obtienen los valores de las manos del dealer y del jugador y se comparan  
+    # Se obtienen los valores de las manos del dealer y del jugador y se comparan
     def game_result(self):
         self.dealer_action()
         player_value = self.hand_value(self.player_hand)
@@ -129,16 +138,22 @@ class BlackjackGame:
             return "draw"
         else:
             return "loss"
-    
-    #formato para imprimir cartas
+
+    # formato para imprimir cartas
     @staticmethod
     def format_cards(cards):
         result = ""
         for card in cards:
             suit = BlackjackGame.suits[card["suit"]]
             result += f"{card['number']}{suit} "
-        
+
         return result.strip()
+
+    def get_prob_of21(self):
+        amountNeeded = 21 - self.hand_value(self.player_hand)
+        prob = 100 * amountNeeded / 21
+
+        return int(prob)
 
 def main():
     game = BlackjackGame()
@@ -152,7 +167,7 @@ def main():
         print(game.format_cards(game.player_hand), game.hand_value(game.player_hand))
         action = input("Enter an action (hit/stay/split/double): ")
         action, status = game.player_action(action)
-        
+
         if action == "stay":
             break
 

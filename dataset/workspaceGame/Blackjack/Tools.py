@@ -7,56 +7,81 @@ import platform
 
 VERBOSETRAIN = 0
 
-class SaveModel:
-    def __init__(self):
-        self.checkpointPath = "./models/v{ver}/cp-{epoch:04d}.weights.h5"
-        self.modelPath = "./models/v{ver}/finished_{comVer}.keras"
-
-    def saveCheckpoint(self, model, VERSION, EPOCH):
-        path_dir = os.path.dirname(self.checkpointPath)
-
-        model.save_weights(self.checkpointPath.format(ver=VERSION, epoch=EPOCH))
-
-    def loadCheckpoint(self, model, VERSION, EPOCH):
-        path_dir = os.path.dirname(self.checkpointPath)
-        return model.load_weights(self.checkpointPath.format(ver=VERSION, epoch=EPOCH))
-
-    def saveModel(self, model, VERSION, COMPLETEDVERSION):
-        path_dir = os.path.dirname(self.modelPath)
-
-        model.save(self.modelPath.format(ver=VERSION, comVer=COMPLETEDVERSION))
-
-    def loadModel(self, VERSION, COMPLETEDVERSION):
-        path_dir = os.path.dirname(self.modelPath)
-
-        return models.load_model(
-            self.modelPath.format(ver=VERSION, comVer=COMPLETEDVERSION)
-        )
-             
 class Model:
+    def __init__(self, state_size, action_size):
+        self.checkpointPath = "./models/v{ver}/checkpoint_{comVer}/cp-{epoch:04d}.weights.h5"
+        self.modelPath = "./models/v{ver}/finished_{comVer}.keras"
+        if 'TERM_PROGRAM' in os.environ.keys() and os.environ['TERM_PROGRAM'] == 'vscode':
+            self.checkpointPath = "./dataset/workspaceGame/models/v{ver}/checkpoint_{comVer}/cp-{epoch:04d}.weights.h5"
+            self.modelPath = "./dataset/workspaceGame/models/v{ver}/finished_{comVer}.keras"
 
-    def _build_model(self, state_size, action_size):
-        model = models.Sequential()
-        model.add(Input(shape = [state_size], dtype = 'uint8'))
-        model.add(layers.Dense(64, activation="relu"))
-        model.add(layers.Dense(action_size, activation="linear"))
-        
+        self.state_size = state_size
+        self.action_size = action_size
+        self.model = 0
+        self._build_model()
+
+    def _build_model(self):
+        self.model = models.Sequential()
+        self.model.add(Input(shape = [self.state_size], dtype = 'uint8'))
+        self.model.add(layers.Dense(128, activation="relu"))
+        self.model.add(layers.Dense(self.action_size, activation="linear"))
+
         if platform.system() == "Darwin" and platform.processor() == "arm":
             opt = tf.keras.optimizers.legacy.Adam(learning_rate=0.01)
         else:
             opt = tf.keras.optimizers.Adam(learning_rate=0.01)
 
-        model.compile(loss="mse", optimizer=opt, metrics =['accuracy'])
+        self.model.compile(loss="mse", optimizer=opt, metrics =['accuracy'])
+        self.model.summary()
 
-        model.summary()
-    
-        return model
-
-    def act(self, state, epsilon, action_size, model):
+    def act(self, state, epsilon, action_size):
         if np.random.rand() <= epsilon:
             return random.randrange(action_size)
-        act_values = model.predict(state, verbose=VERBOSETRAIN)
-        return np.argmax(act_values[0])
+        return self.predict(state)
 
     def remember(self, state, action, reward, next_state, done, memory):
         memory.append((state, action, reward, next_state, done))
+
+    def predict(self, state):
+        return np.argmax(self.model.predict(state, verbose=VERBOSETRAIN, use_multiprocessing=True)[0])
+    
+    def loadModel(self, VERSION, COMPLETEDVERSION):
+        self.model = models.load_model(self.modelPath.format(ver=VERSION, comVer=COMPLETEDVERSION))
+
+    def saveModel(self, VERSION, COMPLETEDVERSION):
+        self.model.save(self.modelPath.format(ver=VERSION, comVer=COMPLETEDVERSION))
+
+    def loadCheckpoint(self, VERSION, COMPLETEDVERSION, EPOCH):
+        self.model = models.load_weights(self.checkpointPath.format(ver=VERSION, epoch=EPOCH, comVer= COMPLETEDVERSION))
+
+    def saveCheckpoint(self, VERSION, COMPLETEDVERSION, EPOCH):
+        self.model.save_weights(self.checkpointPath.format(ver=VERSION, epoch=EPOCH))
+
+    def getFinalLatestVersion(self, VERSION):
+        fileExist = True
+        COMPLETEDVERSION = 1
+
+        while fileExist:
+            if os.path.exists(self.modelPath.format(ver=VERSION, comVer=COMPLETEDVERSION)):
+                print(self.modelPath.format(ver=VERSION, comVer=COMPLETEDVERSION))
+                COMPLETEDVERSION +=1
+            else:
+                fileExist = False
+
+        return COMPLETEDVERSION
+
+    def getCheckpointLatestVersion(self, VERSION, COMPLETEDVERSION):
+        fileExist = True
+        EPOCH = 1
+
+        while fileExist:
+            if os.path.exists(
+                self.checkpointPath.format(ver=VERSION, comVer=COMPLETEDVERSION, epoch = EPOCH)
+            ):
+                print(self.checkpointPath.format(ver=VERSION, comVer=COMPLETEDVERSION, epoch = EPOCH))
+                EPOCH += 1
+            else:
+                fileExist = False
+
+        return EPOCH
+

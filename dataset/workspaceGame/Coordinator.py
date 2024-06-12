@@ -5,7 +5,7 @@ import threading
 import json
 import numpy as np
 
-from Blackjack.Tools import SaveModel, Model
+from Blackjack.Tools import Model
 from Blackjack.Environment import BJEnvironment
 
 # Types of JSON Coordinator to Send
@@ -18,17 +18,15 @@ from Blackjack.Environment import BJEnvironment
 # {Version: Version of the model}
 # {ModelWeights: The weights of the model}
 
-VERSION = 2
+VERSION = 4
 COMPLETEDVERSION = 1
 
-SAVEMODELAMOUNT = 10
+SAVEMODELAMOUNT = 2
 
 class Coordinator:
     def __init__(self):
         env = BJEnvironment()
-
-        self.modelCreate = Model()
-        self.saveModel = SaveModel()
+        self.ModelClass = Model(env.state_size, env.action_size)
 
         self.host = ""
         self.buffer_size = 30_000_000
@@ -36,7 +34,7 @@ class Coordinator:
 
         self.model = dict()
 
-        self.model["Model"] = self.modelCreate._build_model(env.state_size, env.action_size)
+        self.model["Model"] = tf.keras.models.clone_model(self.ModelClass.model)
         self.model["Version"] = 0
 
         # Create socket for connections
@@ -75,7 +73,6 @@ class Coordinator:
 
         while True:
             try:
-
                 pass
             except KeyboardInterrupt:
                 break
@@ -97,19 +94,26 @@ class Coordinator:
     def executeRequest(self, client_socket, data_json):
         dataDict = json.loads(data_json)
         print(dataDict)
-        
-        
+
+        valDict = 1
         for key, value in dataDict.items():
             if key == "Type":
                 if value == 1:
+                    valDict = 1
                     print("Sent model")
                     self.sendModel(client_socket)    
 
                 elif value == 2:
+                    valDict = 2
+
+            if key == "Model":
+                if valDict == 2:
                     print("Merged model")
-                    self.merge_networks()
+
+                    self.merge_networks(value[1])
+
                     self.sendModel(client_socket) 
-                    
+
     def sendModel(self, client_socket):
         response = dict()
         response["Version"] = self.model["Version"]
@@ -118,30 +122,23 @@ class Coordinator:
         response_json = json.dumps(response)
 
         self.send_response(client_socket, response_json)
-        
+
     def send_response(self, client_socket, response):
         response_json = json.dumps(response)
         client_socket.send(response_json.encode())
 
     def merge_networks(self, workerModelWeights):
         # Assuming net1 and net2 have the same architecture
-        if self.modelVersion % SAVEMODELAMOUNT == 0:
+        if self.model["Version"] % SAVEMODELAMOUNT == 0 and self.model["Version"] != 0:
             self.saveMainModel()
-            
 
-        newNet = tf.keras.models.clone_model(self.model)
-        newNet.build(
-            self.model.inputShape
-        )  # Build the model with the correct input shape
-
-        weights1 = self.model.get_weights()
+        weights1 = self.model["Model"].get_weights()
         weights2 = workerModelWeights
 
         newWeights = [(w1 + w2) / 2.0 for w1, w2 in zip(weights1, weights2)]
-        newNet.set_weights(newWeights)
 
+        self.model["Model"].set_weights(newWeights)
         self.model["Version"] = self.model["Version"] + 1
-        self.model["Model"] = newNet
 
     def saveMainModel(self):
         self.saveModel.saveModel(self.model, VERSION, COMPLETEDVERSION)

@@ -17,13 +17,11 @@ class DQNAgent:
         VERSION = 1
     ):
 
-        self.ModelClass = Model()
-
-        #Model Parameters        
+        # Model Parameters
         self.state_size = state_size
         self.action_size = action_size
 
-        #HyperParameters
+        # HyperParameters
         self.batch_size = batch_size
         self.alpha = alpha
         self.gamma = 0.95  # factor de descuento para las recompensas futuras
@@ -31,16 +29,14 @@ class DQNAgent:
         self.epsilon_min = 0.01  # tasa de exploración mínima
         self.epsilon_decay = 0.995  # factor de decaimiento de la tasa de exploración
 
-        #DQN Config
+        # DQN Config
         self.memory = deque(maxlen=2000)  # Aquí se define la memoria de repetición
-        self.model = self.ModelClass._build_model(
-            self.state_size, self.action_size
-        ) 
+        self.ModelClass = Model(self.state_size, self.action_size)
 
-        #Save Config
+        # Save Config
         self.version = VERSION
 
-        #Debug Config
+        # Debug Config
         self.SaveToTensorboard = False       
 
     def replay(self, batch_size):
@@ -49,9 +45,11 @@ class DQNAgent:
             target = reward
             if not done:
                 target = reward + self.gamma * np.amax(
-                    self.model.predict(next_state, verbose=VERBOSETRAIN)[0]
+                    self.ModelClass.model.predict(next_state, verbose=VERBOSETRAIN, use_multiprocessing=True)[0]
                 )
-            target_f = self.model.predict(state, verbose=VERBOSETRAIN)
+            target_f = self.ModelClass.model.predict(
+                state, verbose=VERBOSETRAIN, use_multiprocessing=True
+            )
             target_f[0][action] = target
 
             if self.SaveToTensorboard:
@@ -60,43 +58,36 @@ class DQNAgent:
                     histogram_freq=0,
                     write_graph=True,
                 )
-                self.model.fit(state, target_f, epochs=1, verbose=VERBOSETRAIN, callbacks=callbacks)
+                self.ModelClass.model.fit(
+                    state,
+                    target_f,
+                    epochs=1,
+                    verbose=VERBOSETRAIN,
+                    callbacks=callbacks,
+                    use_multiprocessing=True,
+                )
             else:
-                self.model.fit(state, target_f, epochs=1, verbose=VERBOSETRAIN)
+                self.ModelClass.model.fit(
+                    state,
+                    target_f,
+                    epochs=1,
+                    verbose=VERBOSETRAIN,
+                    use_multiprocessing=True,
+                )
 
         if self.epsilon > self.epsilon_min:
             self.epsilon *= self.epsilon_decay
-
-    def get_prob_of21(self, p_hand_value, actual_deck):
-        cards_needed = 21 - p_hand_value
-        if cards_needed <= 0:
-            return 0.0 
-
-        count_needed_cards = 0
-        for card in actual_deck:
-            if card['number'] in ['J', 'Q', 'K']:
-                card_value = 10
-            elif card['number'] == 'A':
-                card_value = 11
-            else:
-                card_value = int(card['number'])
-
-            if card_value == cards_needed:
-                count_needed_cards += 1
-
-        prob = count_needed_cards / len(actual_deck)
-        return prob
 
     def train(self, env, STT):
         self.SaveToTensorboard = STT
 
         done = False
-        env.reset()
+        env.reset(5)
 
         while not done:
             obs = env.get_obs()
             action = self.ModelClass.act(
-                obs, self.epsilon, self.action_size, self.model
+                obs, self.epsilon, self.action_size
             )
             state, action, reward, next_state, doneEnv = env.step(action)
 

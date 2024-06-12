@@ -1,7 +1,0 @@
-Action States
-3
-# hit, stay, double
-
-Observation State 
-3
-# player_sum, dealer_card, usable_ace

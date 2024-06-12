@@ -1,4 +1,3 @@
-# Import socket module
 import socket
 import json
 import numpy as np
@@ -16,13 +15,13 @@ class Client():
     def __init__(self):
         self.port = 40674
         #self.address = "10.142.81.104"
-        self.address = "10.0.0.105"
+        self.address = "10.0.0.103"
         #self.address = "172.20.10.3"
         
-    def sendArray(self, arrayWeights):
+    def sendArray(self, arrayWeights, Version):
         # Message Sent
         arrayList = self.modelWeightList(arrayWeights)
-        inf = {"Type": 2, "Arr": arrayList}
+        inf = {"Type": 2, "Model": [Version, arrayList]}
         ServerInf = json.dumps(inf)
 
         # Message Received
@@ -33,7 +32,7 @@ class Client():
 
     def modelWeightList(self, arrayWeights):
         arrayToList = [
-            weight.tolist() for weight in arrayWeights["Model"].get_weights()
+            weight.tolist() for weight in arrayWeights
         ]
         return arrayToList
         
