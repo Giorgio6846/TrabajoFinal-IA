@@ -9,6 +9,8 @@ services:
     restart: 'always'
     ports:
       - '8888:8888'
+      - '5555:5555'
+      
     volumes: 
       - .\dataset:/tf/dataset:dataset
       - .\program:/tf/program:app
