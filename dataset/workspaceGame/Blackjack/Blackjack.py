@@ -48,6 +48,7 @@ class BlackjackGame:
     # fucion para empezar el juego, donde se crean las manos de los jugadores
     def start_game(self, bet):
         self.firstTurn = True
+        self.splitted_done = False
         self.player_hand = [self.deal_card(), self.deal_card()]
         self.dealer_hand = [self.deal_card(), self.deal_card()]
         self.bet_game = bet #se incializa la variable apuesta que es introducida como un parametro
@@ -86,17 +87,23 @@ class BlackjackGame:
         elif action == "double":
             self.bet_game *= 2
             self.player_hand.append(self.deal_card())
-            self.state = 2
+            self.status = 2
             action = "stay"
         # "Split" divide la mano del jugador en 2, doblando la apuesta (solo aplica cuando la mano del jugador cuenta con 2 cartas del mismo numero)
         elif action == "split":
             if len(self.player_hand) == 2 and self.player_hand[0]['number'] == self.player_hand[1]['number']:
                 self.splitted_hands = [[self.player_hand[0]], [self.player_hand[1]]]
-                self.player_hand = self.splitted_hands[0]
-                self.player_hand.append(self.deal_card())
+                if self.splitted_done:
+                    self.player_hand = self.splitted_hands[1]
+                else:
+                    self.player_hand = self.splitted_hands[0]
+                    self.splitted_done = True
+                
+                self.splitted_hands[0].append(self.deal_card())
                 self.splitted_hands[1].append(self.deal_card())
                 self.bet_game *= 2
-                self.state = 1
+                self.status = 1
+                
             else:
                 print("El split solo es permitido con 2 cartas del mismo valor en la mano")
                 self.badMove = True
