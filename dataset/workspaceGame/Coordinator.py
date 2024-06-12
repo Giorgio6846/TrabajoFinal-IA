@@ -46,12 +46,12 @@ class Coordinator:
         print("[INFO] Server started on {}".format(self.host, self.port))
 
         self.VERSION = VERSION
-        self.COMPLETEDVERSION = COMPLETEDVERSION
+        self.COMPLETEDVERSION = 1
 
-        COMPLETEDVERSION = self.ModelClass.getFinalLatestVersion(VERSION)
+        self.COMPLETEDVERSION = self.ModelClass.getFinalLatestVersion(self.VERSION)
 
-        if COMPLETEDVERSION != 1:
-            self.ModelClass.loadModel(VERSION, COMPLETEDVERSION - 1)
+        if self.COMPLETEDVERSION != 1:
+            self.ModelClass.loadModel(self.VERSION, self.COMPLETEDVERSION - 1)
 
     # Server Functions
     def startServer(self):
