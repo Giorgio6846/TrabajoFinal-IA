@@ -20,7 +20,7 @@ if __name__ == "__main__":
     COMPLETEDVERSION = agent.ModelClass.getFinalLatestVersion(VERSION)
     
     if COMPLETEDVERSION != 1:
-        agent.ModelClass.loadModel(VERSION, COMPLETEDVERSION)
+        agent.ModelClass.loadModel(VERSION, COMPLETEDVERSION-1)
         
     for ep in range(EPISODES):
         if ep % 10 == 0:        
