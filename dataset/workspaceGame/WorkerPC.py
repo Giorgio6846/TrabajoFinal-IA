@@ -1,6 +1,6 @@
 # Thanks to a certain person
 from concurrent.futures import thread
-from multiprocessing import managers
+from multiprocessing import managers, set_start_method
 from multiprocess import Process, Manager
 from multiprocess.managers import BaseManager
 from time import sleep
@@ -19,7 +19,7 @@ MINIEPISODES = 50
 class WorkerPC:
     def __init__(self, Num_Process=4):
         self.Procc = Num_Process
-        self.batch_size = 32
+        self.batch_size = 200
 
         env = BJEnvironment()
         self.ModelClass = Model(env.state_size, env.action_size)
@@ -54,6 +54,8 @@ class WorkerPC:
         self.modelCoordinator["Status"] = "MNI"
         self.managerWorker = Manager()
 
+        set_start_method("spawn", force = True)
+
         self.initWorkers()
 
     def start(self):
@@ -61,7 +63,7 @@ class WorkerPC:
         factoryThread.start()
 
     def initWorkers(self):
-        self.workerInf =self.managerWorker.dict()
+        self.workerInf = self.managerWorker.dict()
         for index in range(self.Procc):
             self.workerInf[index] = ["Waiting", self.modelCoordinator["Status"], self.modelCoordinator["Model"].get_weights()]
 
@@ -69,9 +71,10 @@ class WorkerPC:
                 target=self.training,
                 args=(
                     index,
-                    MINIEPISODES,
                     self.batch_size,
-                    self.workerInf[index],
+                    MINIEPISODES,
+                    self.workerInf,
+                    VERSION
                 ),
             )
 
@@ -91,32 +94,40 @@ class WorkerPC:
     # Models: Where the workers store their models
     # ModelState: The state of the model of the factory to renew the model of the worker
 
-    def training(self, Index, BatchSize, Episodes, Array):           
+    def training(self, Index, BatchSize, Episodes, WorkerInf, VERSION):           
+        from Blackjack.Agent import DQNAgent
+        from Blackjack.Environment import BJEnvironment
+
         env = BJEnvironment()
         agent = DQNAgent(
             env.state_size, env.action_size, 0.01, BatchSize, VERSION
         )
 
         while True:
+            Array = WorkerInf[Index]
+
             if Array[0] == "Waiting":
                 Array[0] = "Working"
 
                 if Array[1] == "MU":
-                    agent.model.set_weights(Array[2])
+                    agent.ModelClass.model.set_weights(Array[2])
 
                 for Episode in range(Episodes):
                     print(f"Process {Index} in episode: {Episode}")
                     agent.train(env, False)
 
-                Array[1] = agent.model.get_weights()
+                Array[1] = agent.ModelClass.model.get_weights()
                 Array[0] = "Finished"
+                print(Array[0], "Worker {index} finished".format(index = Index))
 
-            sleep(5)
+            WorkerInf[Index] = Array
 
             if Array[0] == "Stop":
                 break
 
     def factory(self):      
+        modelModifiedFromCoord = False
+        
         for index in range(self.Procc):
             self.workersHome[index].start()
 
@@ -139,23 +150,35 @@ class WorkerPC:
 
                 self.modelCoordinator["Status"] = "MU"
 
-            elif self.modelCoordinator["Status"] == "MNU":
-                newModel = self.Network.sendArray(self.modelCoordinator["Model"].get_weights())
-                self.updateModel(newModel)
-
+            elif self.modelCoordinator["Status"] == "MNU":   
+                if modelModifiedFromCoord:             
+                  newModel = self.Network.sendArray(self.modelCoordinator["Model"].get_weights(), self.modelCoordinator["Version"])
+                  self.updateModel(newModel)
+                
                 if workersWaiting == True:
                     for index in range(self.Procc):
-                        self.workerInf[index][2] = self.modelCoordinator["Model"].get_weights()
-                        self.workerInf[index][1] = "MU"
+                        Array = self.workerInf[index]
 
+                        Array[2] = self.modelCoordinator["Model"].get_weights()
+                        Array[1] = "MU"
+
+                        self.workerInf[index] = Array
+
+                modelModifiedFromCoord = False
                 self.modelCoordinator["Status"] = "MU"
 
             elif self.modelCoordinator["Status"] == "MU":
                 # See if the model is updated if that so
                 if workersFinished == True:
                     for index in range(self.Procc):
-                        self.merge_networks(self.workerInf[index][2])
-                        self.workerInf[index][0] = "Waiting"
+                        Array = self.workerInf[index]
+
+                        self.merge_networks(Array[2])
+                        modelModifiedFromCoord = True
+                        Array[0] = "Waiting"
+
+                        self.workerInf[index] = Array
+
                     self.modelCoordinator["Status"] = "MNU"
 
     def updateModel(self, newModel):
@@ -163,5 +186,5 @@ class WorkerPC:
         self.modelCoordinator["Model"].set_weights(newModel["ModelWeights"])
 
 if __name__ == '__main__':
-    worker = WorkerPC(1)
+    worker = WorkerPC(2)
     worker.start()

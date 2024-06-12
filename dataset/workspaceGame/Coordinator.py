@@ -18,10 +18,10 @@ from Blackjack.Environment import BJEnvironment
 # {Version: Version of the model}
 # {ModelWeights: The weights of the model}
 
-VERSION = 3
+VERSION = 4
 COMPLETEDVERSION = 1
 
-SAVEMODELAMOUNT = 10
+SAVEMODELAMOUNT = 2
 
 class Coordinator:
     def __init__(self):
@@ -106,10 +106,12 @@ class Coordinator:
                 elif value == 2:
                     valDict = 2
 
-            if key == "ModelWeights":
+            if key == "Model":
                 if valDict == 2:
                     print("Merged model")
-                    self.merge_networks(value)
+
+                    self.merge_networks(value[1])
+
                     self.sendModel(client_socket) 
 
     def sendModel(self, client_socket):
@@ -136,6 +138,7 @@ class Coordinator:
         newWeights = [(w1 + w2) / 2.0 for w1, w2 in zip(weights1, weights2)]
 
         self.model["Model"].set_weights(newWeights)
+        self.model["Version"] = self.model["Version"] + 1
 
     def saveMainModel(self):
         self.saveModel.saveModel(self.model, VERSION, COMPLETEDVERSION)
