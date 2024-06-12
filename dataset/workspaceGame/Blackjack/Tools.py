@@ -9,10 +9,10 @@ VERBOSETRAIN = 0
 
 class Model:
     def __init__(self, state_size, action_size):
-        self.checkpointPath = "./models/v{ver}/cp-{epoch:04d}.weights.h5"
+        self.checkpointPath = "./models/v{ver}/checkpoint_{comVer}/cp-{epoch:04d}.weights.h5"
         self.modelPath = "./models/v{ver}/finished_{comVer}.keras"
         if 'TERM_PROGRAM' in os.environ.keys() and os.environ['TERM_PROGRAM'] == 'vscode':
-            self.checkpointPath = "./dataset/workspaceGame/models/v{ver}/cp-{epoch:04d}.weights.h5"
+            self.checkpointPath = "./dataset/workspaceGame/models/v{ver}/checkpoint_{comVer}/cp-{epoch:04d}.weights.h5"
             self.modelPath = "./dataset/workspaceGame/models/v{ver}/finished_{comVer}.keras"
 
         self.state_size = state_size
@@ -46,15 +46,15 @@ class Model:
         return np.argmax(self.model.predict(state, verbose=VERBOSETRAIN, use_multiprocessing=True)[0])
     
     def loadModel(self, VERSION, COMPLETEDVERSION):
-        self.model = models.load_model(self.model.format(ver=VERSION, comVer=COMPLETEDVERSION))
+        self.model = models.load_model(self.modelPath.format(ver=VERSION, comVer=COMPLETEDVERSION))
 
     def saveModel(self, VERSION, COMPLETEDVERSION):
         self.model.save(self.modelPath.format(ver=VERSION, comVer=COMPLETEDVERSION))
 
-    def loadCheckpoint(self, VERSION, EPOCH):
-        self.model = models.load_weights(self.checkpointPath.format(ver=VERSION, epoch=EPOCH))
+    def loadCheckpoint(self, VERSION, COMPLETEDVERSION, EPOCH):
+        self.model = models.load_weights(self.checkpointPath.format(ver=VERSION, epoch=EPOCH, comVer= COMPLETEDVERSION))
 
-    def saveCheckpoint(self, VERSION, EPOCH):
+    def saveCheckpoint(self, VERSION, COMPLETEDVERSION, EPOCH):
         self.model.save_weights(self.checkpointPath.format(ver=VERSION, epoch=EPOCH))
 
     def getFinalLatestVersion(self, VERSION):
@@ -70,17 +70,18 @@ class Model:
 
         return COMPLETEDVERSION
 
-    def getCheckpointLatestVersion(self, VERSION):
+    def getCheckpointLatestVersion(self, VERSION, COMPLETEDVERSION):
         fileExist = True
-        COMPLETEDVERSION = 1
+        EPOCH = 1
 
         while fileExist:
             if os.path.exists(
-                self.checkpointPath.format(ver=VERSION, epoch=COMPLETEDVERSION)
+                self.checkpointPath.format(ver=VERSION, comVer=COMPLETEDVERSION, epoch = EPOCH)
             ):
-                print(self.checkpointPath.format(ver=VERSION, epoch=COMPLETEDVERSION))
-                COMPLETEDVERSION += 1
+                print(self.checkpointPath.format(ver=VERSION, comVer=COMPLETEDVERSION, epoch = EPOCH))
+                EPOCH += 1
             else:
                 fileExist = False
 
-        return COMPLETEDVERSION
+        return EPOCH
+

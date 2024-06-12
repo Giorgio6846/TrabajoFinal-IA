@@ -1,10 +1,10 @@
 import numpy as np
 import tensorflow as tf
 from Blackjack.Environment import BJEnvironment
-from Blackjack.Tools import SaveModel, Model
+from Blackjack.Tools import Model
 
-VERSION = 6
-COMPLETEDVERSION = 7
+VERSION = 1
+COMPLETEDVERSION = 1
 VERBOSETRAIN = 1
 
 class Test:
@@ -13,7 +13,6 @@ class Test:
         self.ModelClass = Model(self.env.state_size,self.env.action_size)
 
         self.state_size = 3
-        self.epsilon = 0
 
     def play(self, bet):
         self.env.reset(bet)
@@ -35,7 +34,7 @@ class Test:
 if __name__ == "__main__":
     TestClass = Test()
     TestClass.ModelClass.loadModel(VERSION, COMPLETEDVERSION)
-
+        
     # Evaluate the agent
     test_games = 10000
     wins, losses, draws = 0, 0, 0
