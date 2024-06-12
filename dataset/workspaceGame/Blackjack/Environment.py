@@ -9,14 +9,14 @@ class BJEnvironment(gym.Env):
         self.game = BlackjackGame()
         self.deck_min_len = 109
 
-        # player_sum, dealer_sum, usable_ace, split_pos, double_pos, prob_21, game_state
+        # player_sum, dealer_sum, usable_ace, has_split, has_double, prob_21, game_state
         # game_state = 0 normal, 1 split, 2 double
         self.state_size = 7
 
         # Hit, Stand, Split, Double
         self.action_size = 4
 
-        self.observation_space = spaces.Box(0, 100, shape=(self.state_size,), dtype=np.uint8)
+        self.observation_space = spaces.Box(low=np.array([2,2,0,0,0,1,0]), high=np.array([30,30,1,1,1,10,2]), shape=(self.state_size,), dtype=np.uint8)
         self.action_space = spaces.Discrete(self.action_size)
 
     @staticmethod
@@ -41,10 +41,10 @@ class BJEnvironment(gym.Env):
             reward = 0
 
             bet = self.game.return_bounty(self.bet, act_string)
-            
+
             if self.game.badMove:
                 reward = -100
-            
+
             if status[1] == "player_blackjack":
                 reward += bet
             elif status[1] == "player_bust":
@@ -71,21 +71,24 @@ class BJEnvironment(gym.Env):
         if self.game.firstTurn:
             dealer_card = self.game.hand_value(self.game.dealer_hand[:1])
         usable_ace = self.has_usable_ace(self.game.player_hand)
-        split_possibility = (
+        has_split = (
             len(self.game.player_hand) == 2
             and self.game.player_hand[0]["number"] == self.game.player_hand[1]["number"]
         )
-        double_possibility = self.game.firstTurn
+        has_double = self.game.firstTurn
         prob_21 = self.game.get_prob_of21()
         game_state = self.game.status
+
+        if game_state == 1 and player_sum > 21:
+            player_sum = self.game.hand_value(self.game.splitted_hands[1])
 
         state = np.array(
             [
                 player_sum,
                 dealer_card,
                 usable_ace,
-                split_possibility,
-                double_possibility,
+                has_split,
+                has_double,
                 prob_21,
                 game_state,
             ]
