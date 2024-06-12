@@ -19,7 +19,7 @@ MINIEPISODES = 50
 class WorkerPC:
     def __init__(self, Num_Process=4):
         self.Procc = Num_Process
-        self.batch_size = 200
+        self.batch_size = 32
 
         env = BJEnvironment()
         self.ModelClass = Model(env.state_size, env.action_size)
@@ -186,5 +186,5 @@ class WorkerPC:
         self.modelCoordinator["Model"].set_weights(newModel["ModelWeights"])
 
 if __name__ == '__main__':
-    worker = WorkerPC(2)
+    worker = WorkerPC(6)
     worker.start()

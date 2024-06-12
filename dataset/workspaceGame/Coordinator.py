@@ -141,7 +141,7 @@ class Coordinator:
         self.model["Version"] = self.model["Version"] + 1
 
     def saveMainModel(self):
-        self.saveModel.saveModel(self.model, VERSION, COMPLETEDVERSION)
+        self.ModelClass.saveModel(VERSION, COMPLETEDVERSION)
         COMPLETEDVERSION = COMPLETEDVERSION + 1
 
 if __name__ == "__main__":
