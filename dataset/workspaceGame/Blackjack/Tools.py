@@ -1,5 +1,6 @@
 import os
 from tensorflow.keras import layers, models, Input
+from pathlib import Path
 import tensorflow as tf
 import numpy as np
 import random
@@ -64,11 +65,12 @@ class Model:
         if not os.path.exists(
             os.path.dirname(self.modelPath.format(ver=VERSION, comVer=COMPLETEDVERSION))
         ):
-            os.makedirs(
+            Path(
                 os.path.dirname(
                     self.modelPath.format(ver=VERSION, comVer=COMPLETEDVERSION)
                 )
-            )
+            ).parent.mkdir(exist_ok=True, parents=True)
+
         self.model.save(self.modelPath.format(ver=VERSION, comVer=COMPLETEDVERSION))
 
     def loadCheckpoint(self, VERSION, COMPLETEDVERSION, EPOCH):
@@ -86,13 +88,14 @@ class Model:
                 )
             )
         ):
-            os.makedirs(
+            Path(
                 os.path.dirname(
                     self.checkpointPath.format(
                         ver=VERSION, epoch=EPOCH, comVer=COMPLETEDVERSION
                     )
                 )
-            )
+            ).parent.mkdir(exist_ok=True, parents=True)
+            
         self.model.save_weights(
             self.checkpointPath.format(
                 ver=VERSION, epoch=EPOCH, comVer=COMPLETEDVERSION
@@ -137,7 +140,8 @@ class Model:
 
     def saveStatus(self, fileVersion, VERSION):
         if not os.path.exists("./models/v{ver}/info.txt".format(ver=VERSION)):
-            f = open("./models/v{ver}/info.txt".format(ver=VERSION), "a")
+            Path("./models/v{ver}/info.txt".format(ver=VERSION)).parent.mkdir(exist_ok=True, parents=True)
+            f = open("./models/v{ver}/info.txt".format(ver=VERSION), "w")
             if fileVersion == 1:
                 f.write("Train based on SingleTraining")
             else:

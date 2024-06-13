@@ -18,15 +18,8 @@ from Blackjack.Environment import BJEnvironment
 # {Version: Version of the model}
 # {ModelWeights: The weights of the model}
 
-<<<<<<< Updated upstream
-VERSION = 4
-COMPLETEDVERSION = 1
-
-SAVEMODELAMOUNT = 2
-=======
 VERSION = 3
 SAVECHECKPOINTEVERY = 2
->>>>>>> Stashed changes
 
 class Coordinator:
     def __init__(self):
@@ -50,20 +43,10 @@ class Coordinator:
         self.serverSocket.listen(10)
         print("[INFO] Server started on {}".format(self.host, self.port))
 
-<<<<<<< Updated upstream
-        self.VERSION = VERSION
-        self.COMPLETEDVERSION = 1
-
-        self.COMPLETEDVERSION = self.ModelClass.getFinalLatestVersion(self.VERSION)
-
-        if self.COMPLETEDVERSION != 1:
-            self.ModelClass.loadModel(self.VERSION, self.COMPLETEDVERSION - 1)
-=======
         self.completedVersion = self.ModelClass.getFinalLatestVersion(VERSION)
         self.epoch = 1
         
         self.loadMainModel()
->>>>>>> Stashed changes
 
     # Server Functions
     def startServer(self):
@@ -173,10 +156,6 @@ class Coordinator:
             self.ModelClass.loadModel(VERSION, self.completedVersion-1)
 
     def saveMainModel(self):
-<<<<<<< Updated upstream
-        self.ModelClass.saveModel(self.VERSION, self.COMPLETEDVERSION)
-        self.COMPLETEDVERSION = COMPLETEDVERSION + 1
-=======
         self.copyModel()
 
         self.ModelClass.saveModel(VERSION, self.completedVersion)
@@ -187,7 +166,6 @@ class Coordinator:
 
         self.ModelClass.saveCheckpoint(VERSION, self.completedVersion, self.epoch)
         self.epoch = self.epoch + 1
->>>>>>> Stashed changes
 
 if __name__ == "__main__":
     Coord = Coordinator()

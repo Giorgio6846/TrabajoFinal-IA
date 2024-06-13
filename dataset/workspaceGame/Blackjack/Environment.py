@@ -16,7 +16,7 @@ class BJEnvironment(gym.Env):
         # Hit, Stand, Split, Double
         self.action_size = 4
 
-        self.observation_space = spaces.Box(low=np.array([2,2,0,0,0,1,0]), high=np.array([30,30,1,1,1,10,2]), shape=(self.state_size,), dtype=np.uint8)
+        self.observation_space = spaces.Box(low=np.array([4,4,0,0,0,1,0]), high=np.array([30,30,1,1,1,9,2]), shape=(self.state_size,), dtype=np.uint8)
         self.action_space = spaces.Discrete(self.action_size)
 
     @staticmethod
@@ -43,13 +43,15 @@ class BJEnvironment(gym.Env):
             bet = self.game.return_bounty(self.bet, act_string)
 
             if self.game.badMove:
-                reward = -100
+                reward = -10
 
             if status[1] == "player_blackjack":
-                reward += bet
+                #reward += bet
+                reward = 1
             elif status[1] == "player_bust":
-                reward -= bet
-
+                #reward -= bet
+                reward = -1
+                
             done = status[1] in ["player_blackjack", "player_bust"]
 
             return state, action, reward, self.get_obs(), done

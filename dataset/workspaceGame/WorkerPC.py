@@ -185,10 +185,5 @@ class WorkerPC:
         self.modelCoordinator["Model"].set_weights(newModel["ModelWeights"])
 
 if __name__ == '__main__':
-<<<<<<< Updated upstream
     worker = WorkerPC(6)
     worker.start()
-=======
-    worker = WorkerPC(1)
-    worker.start()
->>>>>>> Stashed changes
