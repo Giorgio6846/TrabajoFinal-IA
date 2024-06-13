@@ -15,6 +15,11 @@ class Model:
             "./models/v{ver}/checkpoint_{comVer}/cp-{epoch:04d}.weights.h5"
         )
         self.modelPath = "./models/v{ver}/finished_{comVer}.keras"
+        self.checkpointDir = (
+            "./models/v{ver}/checkpoint_{comVer}/"
+        )
+        self.modelDir = "./models/v{ver}/"
+
         if (
             "TERM_PROGRAM" in os.environ.keys()
             and os.environ["TERM_PROGRAM"] == "vscode"
@@ -22,6 +27,10 @@ class Model:
             self.checkpointPath = "./dataset/workspaceGame/models/v{ver}/checkpoint_{comVer}/cp-{epoch:04d}.weights.h5"
             self.modelPath = (
                 "./dataset/workspaceGame/models/v{ver}/finished_{comVer}.keras"
+            )
+            self.checkpointDir = "./dataset/workspaceGame/models/v{ver}/checkpoint_{comVer}/"
+            self.modelDir = (
+                "./dataset/workspaceGame/models/v{ver}/"
             )
 
         self.state_size = state_size
@@ -66,9 +75,7 @@ class Model:
             os.path.dirname(self.modelPath.format(ver=VERSION, comVer=COMPLETEDVERSION))
         ):
             Path(
-                os.path.dirname(
-                    self.modelPath.format(ver=VERSION, comVer=COMPLETEDVERSION)
-                )
+                    self.modelDir.format(ver=VERSION, comVer=COMPLETEDVERSION)
             ).parent.mkdir(exist_ok=True, parents=True)
 
         self.model.save(self.modelPath.format(ver=VERSION, comVer=COMPLETEDVERSION))
@@ -89,13 +96,11 @@ class Model:
             )
         ):
             Path(
-                os.path.dirname(
-                    self.checkpointPath.format(
-                        ver=VERSION, epoch=EPOCH, comVer=COMPLETEDVERSION
-                    )
+                self.checkpointDir.format(
+                    ver=VERSION, epoch=EPOCH, comVer=COMPLETEDVERSION
                 )
             ).parent.mkdir(exist_ok=True, parents=True)
-            
+
         self.model.save_weights(
             self.checkpointPath.format(
                 ver=VERSION, epoch=EPOCH, comVer=COMPLETEDVERSION

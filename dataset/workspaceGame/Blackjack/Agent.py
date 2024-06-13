@@ -20,13 +20,14 @@ class DQNAgent:
         # Model Parameters
         self.state_size = state_size
         self.action_size = action_size
+        self.stepsAmount = 10
 
         # HyperParameters
         self.batch_size = batch_size
         self.alpha = alpha
         self.gamma = 0.95  # factor de descuento para las recompensas futuras
         self.epsilon = 0.9  # tasa de exploración inicial
-        self.epsilon_min = 0.01  # tasa de exploración mínima
+        self.epsilon_min = 0.05  # tasa de exploración mínima
         self.epsilon_decay = 0.995  # factor de decaimiento de la tasa de exploración
 
         # DQN Config
@@ -80,27 +81,25 @@ class DQNAgent:
 
     def train(self, env, STT):
         self.SaveToTensorboard = STT
-
         done = False
         env.reset(5)
 
-        while not done:
+        for _ in range(self.stepsAmount):
             obs = env.get_obs()
             action = self.ModelClass.act(
                 obs, self.epsilon, self.action_size
             )
             state, action, reward, next_state, done = env.step(action)
 
-            if env.get_badmove:
-                done = True
+            self.ModelClass.remember(
+                state, action, reward, next_state, True, self.memory
+            )
+
+            if done or env.get_badmove():
                 self.ModelClass.remember(
                     state, action, reward, next_state, True, self.memory
                 )
-            if done == True:
-                done = True
-                self.ModelClass.remember(
-                    state, action, reward, next_state, True, self.memory
-                )
+                break
 
         if len(self.memory) > self.batch_size:
             self.replay(self.batch_size)

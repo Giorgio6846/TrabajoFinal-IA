@@ -99,7 +99,7 @@ class WorkerPC:
 
         env = BJEnvironment()
         agent = DQNAgent(
-            env.state_size, env.action_size, 0.01, BatchSize, VERSION
+            env.state_size, env.action_size, 0.2, BatchSize, VERSION
         )
 
         while True:

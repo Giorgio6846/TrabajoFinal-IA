@@ -1,9 +1,7 @@
-from multiprocess import Process, Manager
 import tensorflow as tf
 import socket
 import threading
 import json
-import numpy as np
 
 from Blackjack.Tools import Model
 from Blackjack.Environment import BJEnvironment
@@ -158,7 +156,7 @@ class Coordinator:
 
     def loadMainModel(self):
         self.copyModel()
-
+        
         if self.completedVersion != 1:
             self.ModelClass.loadModel(VERSION, self.completedVersion-1)
 
