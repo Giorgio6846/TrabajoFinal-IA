@@ -104,7 +104,7 @@ class BlackjackGame:
 
     # funcion para retornar el valor de la apuesta, en caso de que se doble o se haga split.
     def return_bounty(self, bet, action):
-        if(action == "double"):
+        if(action == "double" or action == "split"):
             return bet*2
         return bet
 

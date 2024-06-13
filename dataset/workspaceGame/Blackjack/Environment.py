@@ -31,6 +31,10 @@ class BJEnvironment(gym.Env):
             ace |= card_number == "A"
         return int(ace and value + 10 <= 21)
 
+
+    def get_badmove(self):
+        return self.game.badMove
+
     def step(self, action):
         act_string = ["hit", "stay", "double", "split"][action]
         state = self.get_obs()
@@ -43,7 +47,7 @@ class BJEnvironment(gym.Env):
             bet = self.game.return_bounty(self.bet, act_string)
 
             if self.game.badMove:
-                reward = -10
+                reward = -5
 
             if status[1] == "player_blackjack":
                 #reward += bet

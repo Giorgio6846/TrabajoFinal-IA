@@ -89,9 +89,9 @@ class DQNAgent:
             action = self.ModelClass.act(
                 obs, self.epsilon, self.action_size
             )
-            state, action, reward, next_state, doneEnv = env.step(action)
+            state, action, reward, next_state, done = env.step(action)
 
-            if doneEnv == 1:
+            if env.get_badmove:
                 done = True
                 self.ModelClass.remember(
                     state, action, reward, next_state, True, self.memory

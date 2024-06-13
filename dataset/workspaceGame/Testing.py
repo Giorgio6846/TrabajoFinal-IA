@@ -24,7 +24,9 @@ class Test:
             action = self.ModelClass.predict(state)
             state, action, bet, next_state, done = self.env.step(action)
             if bet == -10:
+                done = True
                 return "BadMove"
+                
             total_reward += bet
 
             if done:

@@ -13,7 +13,7 @@ if __name__ == "__main__":
     batch_size = 128
 
     env = BJEnvironment()
-    agent = DQNAgent(env.state_size, env.action_size, 0.01, batch_size, VERSION)
+    agent = DQNAgent(env.state_size, env.action_size, 0.1, batch_size, VERSION)
 
     COMPLETEDVERSION = agent.ModelClass.getFinalLatestVersion(VERSION)
     
@@ -21,7 +21,6 @@ if __name__ == "__main__":
         agent.ModelClass.loadModel(VERSION, COMPLETEDVERSION-1)
         
     agent.ModelClass.saveStatus(1, VERSION)
-        
     for ep in range(EPISODES):
         if ep % 10 == 0:        
             print(ep)
