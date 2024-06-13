@@ -96,6 +96,11 @@ class DQNAgent:
                 self.ModelClass.remember(
                     state, action, reward, next_state, True, self.memory
                 )
+            if done == True:
+                done = True
+                self.ModelClass.remember(
+                    state, action, reward, next_state, True, self.memory
+                )
 
         if len(self.memory) > self.batch_size:
             self.replay(self.batch_size)

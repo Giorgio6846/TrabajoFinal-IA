@@ -33,6 +33,7 @@ class BlackjackGame:
 
     def regenerate_deck(self):
         self.deck = self.generate_deck()
+        random.shuffle(self.deck)
 
     @staticmethod
     def generate_deck():
