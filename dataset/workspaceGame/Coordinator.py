@@ -25,6 +25,7 @@ class Coordinator:
     def __init__(self):
         env = BJEnvironment()
         self.ModelClass = Model(env.state_size, env.action_size)
+        self.ModelClass._build_model()
 
         self.host = ""
         self.buffer_size = 30_000_000
@@ -136,6 +137,12 @@ class Coordinator:
             self.model["Version"] % SAVECHECKPOINTEVERY == 0
             and self.model["Version"] != 0
         ):
+            self.saveCheckpoint()
+            
+        if (
+            self.model["Version"] % SAVECHECKPOINTEVERY == 0
+            and self.model["Version"] != 0
+        ):
             self.saveMainModel()
 
         weights1 = self.model["Model"].get_weights()
@@ -147,7 +154,7 @@ class Coordinator:
         self.model["Version"] = self.model["Version"] + 1
 
     def copyModel(self):
-        self.ModelClass = tf.keras.models.clone_model(self.model["Model"])
+        self.ModelClass.model = tf.keras.models.clone_model(self.model["Model"])
 
     def loadMainModel(self):
         self.copyModel()
