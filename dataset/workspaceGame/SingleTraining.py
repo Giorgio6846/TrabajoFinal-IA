@@ -1,7 +1,7 @@
 from Blackjack.Agent import DQNAgent
 from Blackjack.Environment import BJEnvironment
 
-VERSION = 10
+VERSION = 11
 COMPLETEDVERSION = 1
 EPOCH = 1
 SAVEEVERY = 250

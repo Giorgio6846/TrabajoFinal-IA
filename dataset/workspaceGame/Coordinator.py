@@ -1,7 +1,7 @@
 import tensorflow as tf
 import socket
 import threading
-import json
+import pickle
 
 from Blackjack.Tools import Model
 from Blackjack.Environment import BJEnvironment
@@ -44,7 +44,7 @@ class Coordinator:
 
         self.completedVersion = self.ModelClass.getFinalLatestVersion(VERSION)
         self.epoch = 1
-        
+
         self.loadMainModel()
 
     # Server Functions
@@ -61,9 +61,9 @@ class Coordinator:
         while True:
             data = self.getData(client_socket)
 
-            data_json = json.loads(data.decode())
+            data_pickle = pickle.loads(data)
 
-            self.executeRequest(client_socket,data_json)
+            self.executeRequest(client_socket, data_pickle)
             break
 
         client_socket.close()
@@ -93,12 +93,11 @@ class Coordinator:
 
         return data
 
-    def executeRequest(self, client_socket, data_json):
-        dataDict = json.loads(data_json)
-        print(dataDict)
+    def executeRequest(self, client_socket, data_pickle):
+        print(data_pickle)
 
         valDict = 1
-        for key, value in dataDict.items():
+        for key, value in data_pickle.items():
             if key == "Type":
                 if value == 1:
                     valDict = 1
@@ -121,13 +120,12 @@ class Coordinator:
         response["Version"] = self.model["Version"]
         arrayToList = [weight.tolist() for weight in self.model["Model"].get_weights()]
         response["ModelWeights"] = arrayToList
-        response_json = json.dumps(response)
 
-        self.send_response(client_socket, response_json)
+        self.send_response(client_socket, response)
 
     def send_response(self, client_socket, response):
-        response_json = json.dumps(response)
-        client_socket.send(response_json.encode())
+        response_json = pickle.dumps(response)
+        client_socket.send(response_json)
 
     def merge_networks(self, workerModelWeights):
         # Assuming net1 and net2 have the same architecture
@@ -136,7 +134,7 @@ class Coordinator:
             and self.model["Version"] != 0
         ):
             self.saveCheckpoint()
-            
+
         if (
             self.model["Version"] % SAVECHECKPOINTEVERY == 0
             and self.model["Version"] != 0
@@ -156,7 +154,7 @@ class Coordinator:
 
     def loadMainModel(self):
         self.copyModel()
-        
+
         if self.completedVersion != 1:
             self.ModelClass.loadModel(VERSION, self.completedVersion-1)
 

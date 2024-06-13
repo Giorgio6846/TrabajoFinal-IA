@@ -14,7 +14,7 @@ class BJEnvironment(gym.Env):
         self.state_size = 7
 
         # Hit, Stand, Split, Double
-        self.action_size = 2
+        self.action_size = 4
 
         self.observation_space = spaces.Box(low=np.array([4,4,0,0,0,1,0]), high=np.array([30,30,1,1,1,9,2]), shape=(self.state_size,), dtype=np.uint8)
         self.action_space = spaces.Discrete(self.action_size)
