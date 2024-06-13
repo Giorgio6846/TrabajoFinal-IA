@@ -1,0 +1,4 @@
+Train based on SingleTraining
+
+Alpha 0.1
+batch_size 128
