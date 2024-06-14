@@ -4,10 +4,10 @@ import random
 from Blackjack.Tools import Model
 import tensorflow as tf
 
-VERBOSETRAIN = 0
+VERBOSETRAIN = 1
 LOGSPATH = "./models/v{VERSION}/logs"
 
-BATCH_SIZE = 30
+BATCH_SIZE = 32
 ALPHA = 0.2
 
 class DQNAgent:
