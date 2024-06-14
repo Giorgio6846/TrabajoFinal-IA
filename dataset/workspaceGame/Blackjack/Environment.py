@@ -31,7 +31,6 @@ class BJEnvironment(gym.Env):
             ace |= card_number == "A"
         return int(ace and value + 10 <= 21)
 
-
     def get_badmove(self):
         return self.game.badMove
 
@@ -43,19 +42,22 @@ class BJEnvironment(gym.Env):
 
         if status[1] == "continue":
             reward = 0
+            done = 0
 
             bet = self.game.return_bounty(self.bet, act_string)
 
             if self.game.badMove:
                 reward = -5
 
+            if status[0] == "stay" and not done:
+                status = self.game.player_action(status[0])
+                done = status[1] in ["player_blackjack", "player_bust"]
+
             if status[1] == "player_blackjack":
-                #reward += bet
-                reward = 1
+                reward = bet / self.game.bet_game
             elif status[1] == "player_bust":
-                #reward -= bet
-                reward = -1
-                
+                reward = -bet / self.game.bet_game
+
             done = status[1] in ["player_blackjack", "player_bust"]
 
             return state, action, reward, self.get_obs(), done
@@ -67,7 +69,12 @@ class BJEnvironment(gym.Env):
             else (-self.game.bet_game if final_result == "loss" else 0)
         )
         print(self.game.game_result())
-
+        print("Player Cards:")
+        print(self.game.format_cards(self.game.player_hand), "   ", self.game.hand_value(self.game.player_hand))
+        
+        print("Dealer Cards:")
+        print(self.game.format_cards(self.game.dealer_hand), "   ", self.game.hand_value(self.game.dealer_hand))
+        
         return state, action, final_reward, self.get_obs(), True
 
     def get_obs(self):
@@ -115,3 +122,4 @@ class BJEnvironment(gym.Env):
         self.status = ["act", "continue"]
 
         return self.get_obs(), {}
+

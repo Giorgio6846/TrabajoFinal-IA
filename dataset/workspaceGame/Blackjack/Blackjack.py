@@ -101,6 +101,10 @@ class BlackjackGame:
             else:
                 print("El split solo es permitido con 2 cartas del mismo valor en la mano")
                 self.badMove = True
+
+        if action == "stay":
+            self.dealer_action()
+
         return action, self.game_status()
 
     # funcion para retornar el valor de la apuesta, en caso de que se doble o se haga split.
