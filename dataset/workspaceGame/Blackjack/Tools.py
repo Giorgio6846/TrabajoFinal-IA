@@ -8,6 +8,7 @@ import platform
 
 VERBOSETRAIN = 0
 
+LAYERS = 256
 
 class Model:
     def __init__(self, state_size, action_size):
@@ -41,7 +42,7 @@ class Model:
     def _build_model(self):
         self.model = models.Sequential()
         self.model.add(Input(shape=[self.state_size], dtype="uint8"))
-        self.model.add(layers.Dense(128, activation="relu"))
+        self.model.add(layers.Dense(LAYERS, activation="relu"))
         self.model.add(layers.Dense(self.action_size, activation="linear"))
 
         if platform.system() == "Darwin" and platform.processor() == "arm":
@@ -74,9 +75,9 @@ class Model:
         if not os.path.exists(
             os.path.dirname(self.modelPath.format(ver=VERSION, comVer=COMPLETEDVERSION))
         ):
-            Path(
+            os.makedirs(
                     self.modelDir.format(ver=VERSION, comVer=COMPLETEDVERSION)
-            ).parent.mkdir(exist_ok=True, parents=True)
+            )
 
         self.model.save(self.modelPath.format(ver=VERSION, comVer=COMPLETEDVERSION))
 
@@ -95,11 +96,11 @@ class Model:
                 )
             )
         ):
-            Path(
+            os.makedirs(
                 self.checkpointDir.format(
                     ver=VERSION, epoch=EPOCH, comVer=COMPLETEDVERSION
                 )
-            ).parent.mkdir(exist_ok=True, parents=True)
+            )
 
         self.model.save_weights(
             self.checkpointPath.format(
@@ -151,4 +152,12 @@ class Model:
                 f.write("Train based on SingleTraining")
             else:
                 f.write("Train based on WorkerPC")
+            f.close()
+
+    def saveConfigModel(self, dict, VERSION):
+        if not os.path.exists("./models/v{ver}/config.txt".format(ver=VERSION)):
+            Path("./models/v{ver}/config.txt".format(ver=VERSION)).parent.mkdir(exist_ok=True, parents=True)
+            f = open("./models/v{ver}/config.txt".format(ver=VERSION), "w")
+            for key, value in dict.items():
+                f.write(f"{key}: {value} \n")
             f.close()
