@@ -25,7 +25,7 @@ class Test:
             if self.env.get_badmove:
                 done = True
 
-        final_result = "win" if reward > 0 else ("loss" if reward < 0 else "draw")
+        final_result = self.env.get_final_result()
         return final_result
 
 if __name__ == "__main__":
