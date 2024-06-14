@@ -69,12 +69,13 @@ class BJEnvironment(gym.Env):
             else (-self.game.bet_game if final_result == "loss" else 0)
         )
         print(self.game.game_result())
+        print("END")
         print("Player Cards:")
         print(self.game.format_cards(self.game.player_hand), "   ", self.game.hand_value(self.game.player_hand))
-        
+
         print("Dealer Cards:")
         print(self.game.format_cards(self.game.dealer_hand), "   ", self.game.hand_value(self.game.dealer_hand))
-        
+
         return state, action, final_reward, self.get_obs(), True
 
     def get_obs(self):
@@ -122,4 +123,3 @@ class BJEnvironment(gym.Env):
         self.status = ["act", "continue"]
 
         return self.get_obs(), {}
-
