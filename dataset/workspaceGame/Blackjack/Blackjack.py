@@ -137,10 +137,12 @@ class BlackjackGame:
 
         if player_value > 21:
             return "loss"
-        elif dealer_value > 21 or player_value > dealer_value:
-            return "win"
         elif player_value == dealer_value:
             return "draw"
+        elif  dealer_value > 21  and player_value > 21:
+            return "draw"
+        elif player_value > dealer_value:
+            return "win"
         else:
             return "loss"
 
@@ -159,8 +161,9 @@ class BlackjackGame:
         prob = 100 * amountNeeded / 21
 
         prob = prob / 10
+        prob = round(prob, 3)
 
-        return int(prob)
+        return prob
 
 def main():
     game = BlackjackGame()

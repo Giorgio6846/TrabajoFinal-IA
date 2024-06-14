@@ -14,7 +14,7 @@ class BJEnvironment(gym.Env):
         self.state_size = 7
 
         # Hit, Stand, Split, Double
-        self.action_size = 4
+        self.action_size = 2
 
         self.observation_space = spaces.Box(low=np.array([4,4,0,0,0,1,0]), high=np.array([30,30,1,1,1,9,2]), shape=(self.state_size,), dtype=np.uint8)
         self.action_space = spaces.Discrete(self.action_size)
@@ -34,6 +34,10 @@ class BJEnvironment(gym.Env):
     def get_badmove(self):
         return self.game.badMove
 
+    def get_final_result(self):
+        final_result = self.game.game_result()
+        return final_result
+
     def step(self, action):
         act_string = ["hit", "stay", "double", "split"][action]
         state = self.get_obs()
@@ -49,20 +53,21 @@ class BJEnvironment(gym.Env):
             if self.game.badMove:
                 reward = -5
 
-            if status[0] == "stay" and not done:
-                status = self.game.player_action(status[0])
-                done = status[1] in ["player_blackjack", "player_bust"]
+            if status[0] == "stay":
+                done = 1
 
             if status[1] == "player_blackjack":
                 reward = bet / self.game.bet_game
             elif status[1] == "player_bust":
                 reward = -bet / self.game.bet_game
 
-            done = status[1] in ["player_blackjack", "player_bust"]
+            if not done:
+                done = status[1] in ["player_blackjack", "player_bust"]
 
             return state, action, reward, self.get_obs(), done
-
-        final_result = self.game.game_result()
+        
+        final_result = self.get_final_result()
+        
         final_reward = (
             self.game.bet_game
             if final_result == "win"
