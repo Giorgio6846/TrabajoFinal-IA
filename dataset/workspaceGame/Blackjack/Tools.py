@@ -1,5 +1,6 @@
 import os
 from tensorflow.keras import layers, models, Input
+from pathlib import Path
 import tensorflow as tf
 import numpy as np
 import random
@@ -7,13 +8,31 @@ import platform
 
 VERBOSETRAIN = 0
 
+LAYERS = 256
+
 class Model:
     def __init__(self, state_size, action_size):
-        self.checkpointPath = "./models/v{ver}/checkpoint_{comVer}/cp-{epoch:04d}.weights.h5"
+        self.checkpointPath = (
+            "./models/v{ver}/checkpoint_{comVer}/cp-{epoch:04d}.weights.h5"
+        )
         self.modelPath = "./models/v{ver}/finished_{comVer}.keras"
-        if 'TERM_PROGRAM' in os.environ.keys() and os.environ['TERM_PROGRAM'] == 'vscode':
+        self.checkpointDir = (
+            "./models/v{ver}/checkpoint_{comVer}/"
+        )
+        self.modelDir = "./models/v{ver}/"
+
+        if (
+            "TERM_PROGRAM" in os.environ.keys()
+            and os.environ["TERM_PROGRAM"] == "vscode"
+        ):
             self.checkpointPath = "./dataset/workspaceGame/models/v{ver}/checkpoint_{comVer}/cp-{epoch:04d}.weights.h5"
-            self.modelPath = "./dataset/workspaceGame/models/v{ver}/finished_{comVer}.keras"
+            self.modelPath = (
+                "./dataset/workspaceGame/models/v{ver}/finished_{comVer}.keras"
+            )
+            self.checkpointDir = "./dataset/workspaceGame/models/v{ver}/checkpoint_{comVer}/"
+            self.modelDir = (
+                "./dataset/workspaceGame/models/v{ver}/"
+            )
 
         self.state_size = state_size
         self.action_size = action_size
@@ -22,8 +41,8 @@ class Model:
 
     def _build_model(self):
         self.model = models.Sequential()
-        self.model.add(Input(shape = [self.state_size], dtype = 'uint8'))
-        self.model.add(layers.Dense(128, activation="relu"))
+        self.model.add(Input(shape=[self.state_size], dtype="uint8"))
+        self.model.add(layers.Dense(LAYERS, activation="relu"))
         self.model.add(layers.Dense(self.action_size, activation="linear"))
 
         if platform.system() == "Darwin" and platform.processor() == "arm":
@@ -31,7 +50,7 @@ class Model:
         else:
             opt = tf.keras.optimizers.Adam(learning_rate=0.01)
 
-        self.model.compile(loss="mse", optimizer=opt, metrics =['accuracy'])
+        self.model.compile(loss="mse", optimizer=opt, metrics=["accuracy"])
         self.model.summary()
 
     def act(self, state, epsilon, action_size):
@@ -43,28 +62,62 @@ class Model:
         memory.append((state, action, reward, next_state, done))
 
     def predict(self, state):
-        return np.argmax(self.model.predict(state, verbose=VERBOSETRAIN, use_multiprocessing=True)[0])
-    
+        return np.argmax(
+            self.model.predict(state, verbose=VERBOSETRAIN, use_multiprocessing=True)[0]
+        )
+
     def loadModel(self, VERSION, COMPLETEDVERSION):
-        self.model = models.load_model(self.modelPath.format(ver=VERSION, comVer=COMPLETEDVERSION))
+        self.model = models.load_model(
+            self.modelPath.format(ver=VERSION, comVer=COMPLETEDVERSION)
+        )
 
     def saveModel(self, VERSION, COMPLETEDVERSION):
+        if not os.path.exists(
+            os.path.dirname(self.modelPath.format(ver=VERSION, comVer=COMPLETEDVERSION))
+        ):
+            os.makedirs(
+                    self.modelDir.format(ver=VERSION, comVer=COMPLETEDVERSION)
+            )
+
         self.model.save(self.modelPath.format(ver=VERSION, comVer=COMPLETEDVERSION))
 
     def loadCheckpoint(self, VERSION, COMPLETEDVERSION, EPOCH):
-        self.model = models.load_weights(self.checkpointPath.format(ver=VERSION, epoch=EPOCH, comVer= COMPLETEDVERSION))
+        self.model.load_weights(
+            self.checkpointPath.format(
+                ver=VERSION, epoch=EPOCH, comVer=COMPLETEDVERSION
+            )
+        )
 
     def saveCheckpoint(self, VERSION, COMPLETEDVERSION, EPOCH):
-        self.model.save_weights(self.checkpointPath.format(ver=VERSION, epoch=EPOCH))
+        if not os.path.exists(
+            os.path.dirname(
+                self.checkpointPath.format(
+                    ver=VERSION, epoch=EPOCH, comVer=COMPLETEDVERSION
+                )
+            )
+        ):
+            os.makedirs(
+                self.checkpointDir.format(
+                    ver=VERSION, epoch=EPOCH, comVer=COMPLETEDVERSION
+                )
+            )
+
+        self.model.save_weights(
+            self.checkpointPath.format(
+                ver=VERSION, epoch=EPOCH, comVer=COMPLETEDVERSION
+            )
+        )
 
     def getFinalLatestVersion(self, VERSION):
         fileExist = True
         COMPLETEDVERSION = 1
 
         while fileExist:
-            if os.path.exists(self.modelPath.format(ver=VERSION, comVer=COMPLETEDVERSION)):
+            if os.path.exists(
+                self.modelPath.format(ver=VERSION, comVer=COMPLETEDVERSION)
+            ):
                 print(self.modelPath.format(ver=VERSION, comVer=COMPLETEDVERSION))
-                COMPLETEDVERSION +=1
+                COMPLETEDVERSION += 1
             else:
                 fileExist = False
 
@@ -76,12 +129,35 @@ class Model:
 
         while fileExist:
             if os.path.exists(
-                self.checkpointPath.format(ver=VERSION, comVer=COMPLETEDVERSION, epoch = EPOCH)
+                self.checkpointPath.format(
+                    ver=VERSION, comVer=COMPLETEDVERSION, epoch=EPOCH
+                )
             ):
-                print(self.checkpointPath.format(ver=VERSION, comVer=COMPLETEDVERSION, epoch = EPOCH))
+                print(
+                    self.checkpointPath.format(
+                        ver=VERSION, comVer=COMPLETEDVERSION, epoch=EPOCH
+                    )
+                )
                 EPOCH += 1
             else:
                 fileExist = False
 
         return EPOCH
 
+    def saveStatus(self, fileVersion, VERSION):
+        if not os.path.exists("./models/v{ver}/info.txt".format(ver=VERSION)):
+            Path("./models/v{ver}/info.txt".format(ver=VERSION)).parent.mkdir(exist_ok=True, parents=True)
+            f = open("./models/v{ver}/info.txt".format(ver=VERSION), "w")
+            if fileVersion == 1:
+                f.write("Train based on SingleTraining")
+            else:
+                f.write("Train based on WorkerPC")
+            f.close()
+
+    def saveConfigModel(self, dict, VERSION):
+        if not os.path.exists("./models/v{ver}/config.txt".format(ver=VERSION)):
+            Path("./models/v{ver}/config.txt".format(ver=VERSION)).parent.mkdir(exist_ok=True, parents=True)
+            f = open("./models/v{ver}/config.txt".format(ver=VERSION), "w")
+            for key, value in dict.items():
+                f.write(f"{key}: {value} \n")
+            f.close()

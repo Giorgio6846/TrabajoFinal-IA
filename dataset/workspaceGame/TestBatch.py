@@ -10,6 +10,6 @@ VERBOSETRAIN = 1
 
 class TestBatch():
     def __init__():
-        print()
+        testClass = Test()
         
     

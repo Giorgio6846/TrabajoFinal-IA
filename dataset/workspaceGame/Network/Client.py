@@ -1,6 +1,6 @@
 import socket
-import json
 import numpy as np
+import pickle
 
 VERSIONUPDATE = 0
 
@@ -14,15 +14,14 @@ VERSIONUPDATE = 0
 class Client():
     def __init__(self):
         self.port = 40674
-        #self.address = "10.142.81.104"
-        self.address = "10.0.0.103"
-        #self.address = "172.20.10.3"
-        
+        # self.address = "10.142.81.104"
+        # self.address = "10.0.0.103"
+        self.address = "172.20.10.3"
+
     def sendArray(self, arrayWeights, Version):
         # Message Sent
-        arrayList = self.modelWeightList(arrayWeights)
-        inf = {"Type": 2, "Model": [Version, arrayList]}
-        ServerInf = json.dumps(inf)
+        inf = {"Type": 2, "Model": [Version, arrayWeights]}
+        ServerInf = pickle.dumps(inf)
 
         # Message Received
         responseServer = self.connectServer(ServerInf)
@@ -30,16 +29,10 @@ class Client():
 
         return response
 
-    def modelWeightList(self, arrayWeights):
-        arrayToList = [
-            weight.tolist() for weight in arrayWeights
-        ]
-        return arrayToList
-        
     def receiveArray(self):
         # Message Sent
         inf = {"Type": 1}
-        ServerInf = json.dumps(inf)
+        ServerInf = pickle.dumps(inf)
 
         # Message Received
         responseServer = self.connectServer(ServerInf)
@@ -47,12 +40,12 @@ class Client():
 
         return response
 
-    def connectServer(self,jsonServer):    
+    def connectServer(self,pickleInf):    
         s = socket.socket()
 
         s.connect((self.address, self.port))
 
-        s.send(json.dumps(jsonServer).encode())
+        s.send((pickleInf))
 
         buffer = b''
         while True:
@@ -63,7 +56,7 @@ class Client():
 
         res: dict
         try:
-            res = json.loads(buffer.decode())
+            res = pickle.loads(buffer)
         except:
             raise ConnectionError(
                 f"Invalid JSON recived from server")
@@ -73,12 +66,9 @@ class Client():
         return res
 
     def decodeMessage(self, response):
-        dataDict = json.loads(response)
-        #print(dataDict)
-
         responseServer = dict()        
 
-        for key, value in dataDict.items():
+        for key, value in response.items():
             if key == "ModelWeights":
                 weights = [np.array(weight) for weight in value]
                 responseServer["ModelWeights"] = weights

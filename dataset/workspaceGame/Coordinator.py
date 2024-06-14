@@ -1,9 +1,7 @@
-from multiprocess import Process, Manager
 import tensorflow as tf
 import socket
 import threading
-import json
-import numpy as np
+import pickle
 
 from Blackjack.Tools import Model
 from Blackjack.Environment import BJEnvironment
@@ -18,15 +16,14 @@ from Blackjack.Environment import BJEnvironment
 # {Version: Version of the model}
 # {ModelWeights: The weights of the model}
 
-VERSION = 4
-COMPLETEDVERSION = 1
-
-SAVEMODELAMOUNT = 2
+VERSION = 15
+SAVECHECKPOINTEVERY = 2
 
 class Coordinator:
     def __init__(self):
         env = BJEnvironment()
         self.ModelClass = Model(env.state_size, env.action_size)
+        self.ModelClass._build_model()
 
         self.host = ""
         self.buffer_size = 30_000_000
@@ -45,6 +42,11 @@ class Coordinator:
         self.serverSocket.listen(10)
         print("[INFO] Server started on {}".format(self.host, self.port))
 
+        self.completedVersion = self.ModelClass.getFinalLatestVersion(VERSION)
+        self.epoch = 1
+
+        self.loadMainModel()
+
     # Server Functions
     def startServer(self):
         while True:
@@ -59,9 +61,9 @@ class Coordinator:
         while True:
             data = self.getData(client_socket)
 
-            data_json = json.loads(data.decode())
+            data_pickle = pickle.loads(data)
 
-            self.executeRequest(client_socket,data_json)
+            self.executeRequest(client_socket, data_pickle)
             break
 
         client_socket.close()
@@ -91,12 +93,11 @@ class Coordinator:
 
         return data
 
-    def executeRequest(self, client_socket, data_json):
-        dataDict = json.loads(data_json)
-        print(dataDict)
+    def executeRequest(self, client_socket, data_pickle):
+        print(data_pickle)
 
         valDict = 1
-        for key, value in dataDict.items():
+        for key, value in data_pickle.items():
             if key == "Type":
                 if value == 1:
                     valDict = 1
@@ -119,17 +120,25 @@ class Coordinator:
         response["Version"] = self.model["Version"]
         arrayToList = [weight.tolist() for weight in self.model["Model"].get_weights()]
         response["ModelWeights"] = arrayToList
-        response_json = json.dumps(response)
 
-        self.send_response(client_socket, response_json)
+        self.send_response(client_socket, response)
 
     def send_response(self, client_socket, response):
-        response_json = json.dumps(response)
-        client_socket.send(response_json.encode())
+        response_json = pickle.dumps(response)
+        client_socket.send(response_json)
 
     def merge_networks(self, workerModelWeights):
         # Assuming net1 and net2 have the same architecture
-        if self.model["Version"] % SAVEMODELAMOUNT == 0 and self.model["Version"] != 0:
+        if (
+            self.model["Version"] % SAVECHECKPOINTEVERY == 0
+            and self.model["Version"] != 0
+        ):
+            self.saveCheckpoint()
+
+        if (
+            self.model["Version"] % SAVECHECKPOINTEVERY == 0
+            and self.model["Version"] != 0
+        ):
             self.saveMainModel()
 
         weights1 = self.model["Model"].get_weights()
@@ -140,10 +149,28 @@ class Coordinator:
         self.model["Model"].set_weights(newWeights)
         self.model["Version"] = self.model["Version"] + 1
 
+    def copyModel(self):
+        self.ModelClass.model = tf.keras.models.clone_model(self.model["Model"])
+
+    def loadMainModel(self):
+        self.copyModel()
+
+        if self.completedVersion != 1:
+            self.ModelClass.loadModel(VERSION, self.completedVersion-1)
+
     def saveMainModel(self):
-        self.saveModel.saveModel(self.model, VERSION, COMPLETEDVERSION)
-        COMPLETEDVERSION = COMPLETEDVERSION + 1
+        self.copyModel()
+
+        self.ModelClass.saveModel(VERSION, self.completedVersion)
+        self.completedVersion = self.completedVersion + 1
+
+    def saveCheckpoint(self):
+        self.copyModel()
+
+        self.ModelClass.saveCheckpoint(VERSION, self.completedVersion, self.epoch)
+        self.epoch = self.epoch + 1
 
 if __name__ == "__main__":
     Coord = Coordinator()
+    Coord.ModelClass.saveStatus(2, VERSION)
     Coord.start()

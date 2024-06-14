@@ -1,27 +1,30 @@
-from distutils.version import Version
 from Blackjack.Agent import DQNAgent
 from Blackjack.Environment import BJEnvironment
-from Blackjack.Tools import Model
+from Blackjack.Tools import LAYERS
 
-VERSION = 1
+VERSION = 14
 COMPLETEDVERSION = 1
 EPOCH = 1
+
 SAVEEVERY = 250
 
 SAVETOTENSORBOARD = False
 
 if __name__ == "__main__":
-    EPISODES = 2000
-    batch_size = 128
-
+    EPISODES = 10000
+    
     env = BJEnvironment()
-    agent = DQNAgent(env.state_size, env.action_size, 0.01, batch_size, VERSION)
+    agent = DQNAgent(env.state_size, env.action_size, VERSION)
+    configDict = agent.getHyperparameters()
+    configDict["layers"] = LAYERS
+    agent.ModelClass.saveConfigModel(configDict, VERSION)
 
     COMPLETEDVERSION = agent.ModelClass.getFinalLatestVersion(VERSION)
     
     if COMPLETEDVERSION != 1:
         agent.ModelClass.loadModel(VERSION, COMPLETEDVERSION-1)
         
+    agent.ModelClass.saveStatus(1, VERSION)
     for ep in range(EPISODES):
         if ep % 10 == 0:        
             print(ep)

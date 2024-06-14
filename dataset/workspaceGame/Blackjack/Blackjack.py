@@ -33,6 +33,7 @@ class BlackjackGame:
 
     def regenerate_deck(self):
         self.deck = self.generate_deck()
+        random.shuffle(self.deck)
 
     @staticmethod
     def generate_deck():
@@ -107,11 +108,15 @@ class BlackjackGame:
             else:
                 print("El split solo es permitido con 2 cartas del mismo valor en la mano")
                 self.badMove = True
+
+        if action == "stay":
+            self.dealer_action()
+
         return action, self.game_status()
 
     # funcion para retornar el valor de la apuesta, en caso de que se doble o se haga split.
     def return_bounty(self, bet, action):
-        if(action == "double"):
+        if(action == "double" or action == "split"):
             return bet*2
         return bet
 
@@ -139,10 +144,12 @@ class BlackjackGame:
 
         if player_value > 21:
             return "loss"
-        elif dealer_value > 21 or player_value > dealer_value:
-            return "win"
         elif player_value == dealer_value:
             return "draw"
+        elif  dealer_value > 21  and player_value > 21:
+            return "draw"
+        elif player_value > dealer_value:
+            return "win"
         else:
             return "loss"
 
@@ -160,7 +167,10 @@ class BlackjackGame:
         amountNeeded = 21 - self.hand_value(self.player_hand)
         prob = 100 * amountNeeded / 21
 
-        return int(prob)
+        prob = prob / 10
+        prob = round(prob, 3)
+
+        return prob
 
 def main():
     game = BlackjackGame()
