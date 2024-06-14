@@ -13,13 +13,12 @@ from Blackjack.Environment import BJEnvironment
 from Network.Client import Client
 
 VERSION = 8
-COMPLETEDVERSION = 1
-MINIEPISODES = 50
+MINIEPISODES = 200
 
 class WorkerPC:
     def __init__(self, Num_Process=4):
         self.Procc = Num_Process
-        self.batch_size = 200
+        self.batch_size = 32
 
         env = BJEnvironment()
         self.ModelClass = Model(env.state_size, env.action_size)
@@ -100,7 +99,7 @@ class WorkerPC:
 
         env = BJEnvironment()
         agent = DQNAgent(
-            env.state_size, env.action_size, 0.01, BatchSize, VERSION
+            env.state_size, env.action_size, 0.2, BatchSize, VERSION
         )
 
         while True:
@@ -186,5 +185,5 @@ class WorkerPC:
         self.modelCoordinator["Model"].set_weights(newModel["ModelWeights"])
 
 if __name__ == '__main__':
-    worker = WorkerPC(2)
+    worker = WorkerPC(6)
     worker.start()
