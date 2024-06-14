@@ -7,13 +7,14 @@ import tensorflow as tf
 VERBOSETRAIN = 1
 LOGSPATH = "./models/v{VERSION}/logs"
 
+BATCH_SIZE = 32
+ALPHA = 0.03
+
 class DQNAgent:
     def __init__(
         self,
         state_size,
         action_size,
-        alpha=0.01,
-        batch_size=32,
         VERSION = 1
     ):
 
@@ -23,8 +24,8 @@ class DQNAgent:
         self.stepsAmount = 10
 
         # HyperParameters
-        self.batch_size = batch_size
-        self.alpha = alpha
+        self.batch_size = BATCH_SIZE
+        self.alpha = ALPHA
         self.gamma = 0.95  # factor de descuento para las recompensas futuras
         self.epsilon = 0.9  # tasa de exploración inicial
         self.epsilon_min = 0.05  # tasa de exploración mínima
@@ -39,6 +40,26 @@ class DQNAgent:
 
         # Debug Config
         self.SaveToTensorboard = False       
+
+    def getHyperparameters(self):
+        return dict(
+            {
+                "batch_size": self.batch_size,
+                "alpha": self.alpha,
+                "gamma": self.gamma,
+                "epsilon": self.epsilon,
+                "epsilon_min": self.epsilon_min,
+                "epsilon_min": self.epsilon_decay
+            }
+        )
+
+    def setHyperparameters(self, dictHyper):
+        self.batch_size = dictHyper["batch_size"]
+        self.alpha = dictHyper["alpha"]
+        self.gamma = dictHyper["gamma"]
+        self.epsilon = dictHyper["epsilon"]
+        self.epsilon_min = dictHyper["epsilon_min"]
+        self.epsilon_decay = dictHyper["epsilon_decay"]
 
     def replay(self, batch_size):
         minibatch = random.sample(self.memory, batch_size)
@@ -92,13 +113,10 @@ class DQNAgent:
             state, action, reward, next_state, done = env.step(action)
 
             self.ModelClass.remember(
-                state, action, reward, next_state, True, self.memory
+                state, action, reward, next_state, done, self.memory
             )
 
             if done or env.get_badmove():
-                self.ModelClass.remember(
-                    state, action, reward, next_state, True, self.memory
-                )
                 break
 
         if len(self.memory) > self.batch_size:

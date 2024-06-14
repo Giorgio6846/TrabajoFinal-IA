@@ -16,7 +16,7 @@ from Blackjack.Environment import BJEnvironment
 # {Version: Version of the model}
 # {ModelWeights: The weights of the model}
 
-VERSION = 3
+VERSION = 15
 SAVECHECKPOINTEVERY = 2
 
 class Coordinator:

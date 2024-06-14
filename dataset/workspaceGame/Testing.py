@@ -1,7 +1,7 @@
 from Blackjack.Environment import BJEnvironment
 from Blackjack.Tools import Model
 
-VERSION = 7
+VERSION = 13
 COMPLETEDVERSION = 1
 VERBOSETRAIN = 1
 
