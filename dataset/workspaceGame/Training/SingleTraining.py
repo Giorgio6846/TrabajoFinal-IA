@@ -1,6 +1,11 @@
-from Blackjack.Agent import DQNAgent
-from Blackjack.Environment import BJEnvironment
-from Blackjack.Tools import LAYERS
+import sys
+import os
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
+from lib.Model.Agent import DQNAgent
+from lib.Game.Environment import BJEnvironment
+from lib.Model.Tools import LAYERS
 
 VERSION = 1
 COMPLETEDVERSION = 1

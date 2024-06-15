@@ -1,0 +1,1 @@
+Basado en el excel mostrado en el repositorio se va a considera como un minimo de exploracion el 10% de los posibles estados

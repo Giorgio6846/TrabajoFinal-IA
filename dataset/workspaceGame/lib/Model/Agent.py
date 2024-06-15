@@ -1,8 +1,9 @@
 from collections import deque
 import numpy as np
 import random
-from Blackjack.Tools import Model
 import tensorflow as tf
+
+from .Tools import Model
 
 VERBOSETRAIN = 1
 LOGSPATH = "./models/v{VERSION}/logs"

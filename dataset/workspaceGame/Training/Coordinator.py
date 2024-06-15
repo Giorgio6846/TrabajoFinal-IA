@@ -1,10 +1,15 @@
+import sys
+import os
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
 import tensorflow as tf
 import socket
 import threading
 import pickle
 
-from Blackjack.Tools import Model
-from Blackjack.Environment import BJEnvironment
+from lib.Model.Tools import Model
+from lib.Game.Environment import BJEnvironment
 
 # Types of JSON Coordinator to Send
 # Version:

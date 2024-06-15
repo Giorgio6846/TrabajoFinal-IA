@@ -1,16 +1,20 @@
 # Thanks to a certain person
-from concurrent.futures import thread
-from multiprocessing import managers, set_start_method
+import sys
+import os
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
+from multiprocessing import set_start_method
 from multiprocess import Process, Manager
-from multiprocess.managers import BaseManager
 from time import sleep
 import tensorflow as tf
 import threading
+import numpy as np
 
-from Blackjack.Tools import Model
-from Blackjack.Agent import DQNAgent
-from Blackjack.Environment import BJEnvironment
-from Network.Client import Client
+from lib.Model.Tools import Model
+from lib.Model.Agent import DQNAgent
+from lib.Game.Environment import BJEnvironment
+from lib.Network.Client import Client
 
 VERSION = 8
 MINIEPISODES = 200
@@ -77,13 +81,17 @@ class WorkerPC:
                 ),
             )
 
-    def merge_networks(self, newModel):
+    def merge_networks(self):
         # Assuming net1 and net2 have the same architecture
-        newNet = tf.keras.models.clone_model(self.modelCoordinator["Model"])
-        weights1 = self.modelCoordinator["Model"].get_weights()
-        weights2 = newModel
+        modelCord = self.modelCoordinator["Model"].get_weights()
 
-        newWeights = [(w1 + w2) / 2.0 for w1, w2 in zip(weights1, weights2)]
+        newModels = []
+        for index in range(self.Procc):
+            newModels.append(self.workerInf[index][2])
+
+        modelWorkers = np.mean([w1 for w1 in zip(newModels)], axis=0)
+
+        newWeights = [(w1 + w2) / 2.0 for w1, w2 in zip(modelCord, modelWorkers)]
 
         self.modelCoordinator["Model"].set_weights(newWeights)
 
@@ -93,13 +101,13 @@ class WorkerPC:
     # Models: Where the workers store their models
     # ModelState: The state of the model of the factory to renew the model of the worker
 
-    def training(self, Index, BatchSize, Episodes, WorkerInf, VERSION):           
+    def training(self, Index, Episodes, WorkerInf, VERSION):           
         from Blackjack.Agent import DQNAgent
         from Blackjack.Environment import BJEnvironment
 
         env = BJEnvironment()
         agent = DQNAgent(
-            env.state_size, env.action_size, 0.2, BatchSize, VERSION
+            env.state_size, env.action_size, VERSION
         )
 
         while True:
@@ -126,7 +134,7 @@ class WorkerPC:
 
     def factory(self):      
         modelModifiedFromCoord = False
-        
+
         for index in range(self.Procc):
             self.workersHome[index].start()
 
@@ -151,9 +159,9 @@ class WorkerPC:
 
             elif self.modelCoordinator["Status"] == "MNU":   
                 if modelModifiedFromCoord:             
-                  newModel = self.Network.sendArray(self.modelCoordinator["Model"].get_weights(), self.modelCoordinator["Version"])
-                  self.updateModel(newModel)
-                
+                    newModel = self.Network.sendArray(self.modelCoordinator["Model"].get_weights(), self.modelCoordinator["Version"])
+                    self.updateModel(newModel)
+
                 if workersWaiting == True:
                     for index in range(self.Procc):
                         Array = self.workerInf[index]
