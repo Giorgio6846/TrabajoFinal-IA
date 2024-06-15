@@ -28,7 +28,6 @@ class Coordinator:
     def __init__(self):
         env = BJEnvironment()
         self.ModelClass = ModelDQN(env.state_size, env.action_size)
-        self.ModelClass._build_model()
 
         self.host = ""
         self.buffer_size = 30_000_000
