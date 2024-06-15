@@ -1,1 +1,7 @@
 Basado en el excel mostrado en el repositorio se va a considera como un minimo de exploracion el 10% de los posibles estados
+
+Observations:
+
+Model trained on Apple M2 NPU
+Batch Size 16000
+Time: 

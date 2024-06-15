@@ -16,7 +16,7 @@ SAVEEVERY = 250
 SAVETOTENSORBOARD = False
 
 if __name__ == "__main__":
-    EPISODES = 10000
+    EPISODES = 16000
     
     env = BJEnvironment()
     agent = DQNAgent(env.state_size, env.action_size, VERSION)

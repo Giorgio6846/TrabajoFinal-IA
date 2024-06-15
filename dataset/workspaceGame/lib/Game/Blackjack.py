@@ -57,7 +57,7 @@ class BlackjackGame:
         self.current_hand_index = 0
         self.status = 0
         self.badMove = False
-        self.game_status = ""        
+        self.game_status = "continue"
 
         # This is only true when it has been selected split and the first maze has blown
         self.handLose = False
@@ -114,9 +114,10 @@ class BlackjackGame:
                     print("El split solo es permitido con 2 cartas del mismo valor en la mano")
                     self.badMove = True
 
-            if action == "stay":
+            if action == "stay" and self.game_status == "continue":
                 self.dealer_action()
-                self.__checkWinner()
+                if self.__checkWinner():
+                    return action, self.game_status
 
             if not self.__checkBlackjack() or self.__checkBlowCards():
                 self.game_status = "continue"
@@ -223,7 +224,7 @@ class BlackjackGame:
 
     def get_prob_of21(self):
         amountNeeded = 21 - self.hand_value(self.player_hand)
-        prob = 100 * amountNeeded / 21
+        prob = abs(100 * amountNeeded / 21)
 
         prob = prob / 10
         prob = round(prob, 3)

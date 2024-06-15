@@ -26,7 +26,7 @@ while True:
         obs = env.get_obs()
         print_obs(obs)
 
-        action = int(input("Ingrese su accion: 1:Hit, 2:Stand, 3:Split, 4:Double:"))
+        action = int(input("Ingrese su accion: 1:Hit, 2:Stand, 3:Double, 4:Split:"))
         action = action - 1
         state, action, reward, next_state, done = env.step(action)
 

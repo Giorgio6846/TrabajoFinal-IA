@@ -1,9 +1,14 @@
-from Blackjack.Environment import BJEnvironment
-from Blackjack.Tools import Model
+import sys
+import os
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
+from lib.Game.Environment import BJEnvironment
+from lib.Model.Tools import Model
 
 VERSION = 1
-COMPLETEDVERSION = 2
-VERBOSETRAIN = 1
+COMPLETEDVERSION = 1
+VERBOSETRAIN = 6
 
 class Test:
     def __init__(self):

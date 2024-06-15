@@ -11,7 +11,7 @@ import tensorflow as tf
 import threading
 import numpy as np
 
-from lib.Model.Tools import Model
+from lib.Model.Tools import ModelDQN
 from lib.Model.Agent import DQNAgent
 from lib.Game.Environment import BJEnvironment
 from lib.Network.Client import Client
@@ -25,7 +25,7 @@ class WorkerPC:
         self.batch_size = 32
 
         env = BJEnvironment()
-        self.ModelClass = Model(env.state_size, env.action_size)
+        self.ModelClass = ModelDQN(env.state_size, env.action_size)
 
         # Handle Network Operations with Coordinator
         self.Network = Client()
@@ -102,9 +102,14 @@ class WorkerPC:
     # ModelState: The state of the model of the factory to renew the model of the worker
 
     def training(self, Index, Episodes, WorkerInf, VERSION):           
-        from Blackjack.Agent import DQNAgent
-        from Blackjack.Environment import BJEnvironment
+        import sys
+        import os
 
+        sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+        
+        from lib.Model.Agent import DQNAgent
+        from lib.Game.Environment import BJEnvironment
+        
         env = BJEnvironment()
         agent = DQNAgent(
             env.state_size, env.action_size, VERSION

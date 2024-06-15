@@ -8,7 +8,7 @@ import socket
 import threading
 import pickle
 
-from lib.Model.Tools import Model
+from lib.Model.Tools import ModelDQN
 from lib.Game.Environment import BJEnvironment
 
 # Types of JSON Coordinator to Send
@@ -27,7 +27,7 @@ SAVECHECKPOINTEVERY = 2
 class Coordinator:
     def __init__(self):
         env = BJEnvironment()
-        self.ModelClass = Model(env.state_size, env.action_size)
+        self.ModelClass = ModelDQN(env.state_size, env.action_size)
         self.ModelClass._build_model()
 
         self.host = ""
