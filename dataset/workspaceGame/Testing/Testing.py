@@ -4,7 +4,7 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from lib.Game.Environment import BJEnvironment
-from lib.Model.Tools import Model
+from lib.Model.Tools import ModelDQN, Tools
 
 VERSION = 1
 COMPLETEDVERSION = 1
@@ -13,7 +13,7 @@ VERBOSETRAIN = 6
 class Test:
     def __init__(self):
         self.env = BJEnvironment()
-        self.ModelClass = Model(self.env.state_size,self.env.action_size)
+        self.ModelClass = ModelDQN(self.env.state_size,self.env.action_size)
 
         self.state_size = 3
 

@@ -8,51 +8,14 @@ import platform
 VERBOSETRAIN = 0
 LAYERS = 256
 
-class ModelDQN:
-    def __init__(self, state_size, action_size):
-        self.tools = Tools()
-
-        self.state_size = state_size
-        self.action_size = action_size
-        self.model = 0
-        self._build_model()
-
-    def _build_model(self):
-        self.model = models.Sequential()
-        self.model.add(Input(shape=[self.state_size], dtype="uint8"))
-        self.model.add(layers.Dense(LAYERS, activation="relu"))
-        self.model.add(layers.Dense(self.action_size, activation="linear"))
-
-        if platform.system() == "Darwin" and platform.processor() == "arm":
-            opt = tf.keras.optimizers.legacy.Adam(learning_rate=0.01)
-        else:
-            opt = tf.keras.optimizers.Adam(learning_rate=0.01)
-
-        self.model.compile(loss="mse", optimizer=opt, metrics=["accuracy"])
-        self.model.summary()
-
-    def act(self, state, epsilon, action_size):
-        if np.random.rand() <= epsilon:
-            return random.randrange(action_size)
-        return self.predict(state)
-
-    def remember(self, state, action, reward, next_state, done, memory):
-        memory.append((state, action, reward, next_state, done))
-
-    def predict(self, state):
-        return np.argmax(
-            self.model.predict(state, verbose=VERBOSETRAIN, use_multiprocessing=True)[0]
-        )
-
-
 class Tools:
     def __init__(self):
         self.checkpointPath = (
             "./../GameModels/v{ver}/checkpoint_{comVer}/cp-{epoch:04d}.weights.h5"
         )
-        self.modelPath = "./../models/v{ver}/finished_{comVer}.keras"
+        self.modelPath = "./../GameModels/v{ver}/finished_{comVer}.keras"
         self.checkpointDir = "./../GameModels/v{ver}/checkpoint_{comVer}/"
-        self.modelDir = "./../models/v{ver}/"
+        self.modelDir = "./../GameModels/v{ver}/"
 
         if (
             "TERM_PROGRAM" in os.environ.keys()
@@ -155,21 +118,119 @@ class Tools:
 
 class ModelA3C:
     def __init__(self, state_size, action_size):
-        self.tools = Tools()
+        self.tools = 1
         self.model = 1
-        
+
         self.state_size = state_size
         self.action_size = action_size
 
-    def _build_modelCritic(self):
+    def _build_modelCritic(self, opt):
         self.model = models.Sequential()
         self.model.add(Input(shape=[self.state_size], dtype="uint8"))
         self.model.add(layers.Dense(LAYERS, activation="relu"))
         self.model.add(layers.Dense(LAYERS/2, activation="relu"))
         self.model.add(layers.Dense(self.action_size, activation="linear"))
 
-    def _build_modelActor(self):
+        self.model.compile(loss="mse", optimizer=opt, metrics=["accuracy"])
+        self.model.summary()
+
+        self.tools = Tools(self.model)
+
+    def loadModel(self, VERSION, COMPLETEDVERSION):
+        self.model = self.tools.saveModel(VERSION, COMPLETEDVERSION)
+
+    def saveModel(self, VERSION, COMPLETEDVERSION):
+        self.tools.saveModel(VERSION, COMPLETEDVERSION, self.model)
+
+    def loadCheckpoint(self, VERSION, COMPLETEDVERSION, EPOCH):
+        self.model = self.tools.loadCheckpoint(
+            VERSION, COMPLETEDVERSION, EPOCH, self.model
+        )
+
+    def saveCheckpoint(self, VERSION, COMPLETEDVERSION, EPOCH):
+        self.tools.saveCheckpoint(VERSION, COMPLETEDVERSION, EPOCH, self.model)
+
+    def getFinalVersion(self, VERSION):
+        return self.tools.getFinalLatestVersion(VERSION)
+
+    def getCheckpointVersion(self, VERSION, COMPLETEDVERSION):
+        return self.tools.getCheckpointLatestVersion(VERSION, COMPLETEDVERSION)
+
+    def saveStatus(self, fileVersion, VERSION):
+        self.tools.saveStatus(fileVersion, VERSION)
+
+    def saveConfigModel(self, dict, VERSION):
+        self.tools.saveConfigModel(dict, VERSION)
+
+    def _build_modelActor(self, opt):
+        self.model = models.Sequential()
+        self.model.add(Input(shape=[self.state_size], dtype="uint8"))
+        self.model.add(layers.Dense(LAYERS, activation="relu"))
+        self.model.add(layers.Dense(self.action_size, activation="softmax"))
+
+        self.model.compile(loss="mse", optimizer=opt, metrics=["accuracy"])
+        self.model.summary()
+
+        self.tools = Tools(self.model)
+
+    def loadModel(self, VERSION, COMPLETEDVERSION):
+        self.model = self.tools.saveModel(VERSION, COMPLETEDVERSION)
+
+    def saveModel(self, VERSION, COMPLETEDVERSION):
+        self.tools.saveModel(VERSION, COMPLETEDVERSION, self.model)
+
+    def loadCheckpoint(self, VERSION, COMPLETEDVERSION, EPOCH):
+        self.model = self.tools.loadCheckpoint(
+            VERSION, COMPLETEDVERSION, EPOCH, self.model
+        )
+
+    def saveCheckpoint(self, VERSION, COMPLETEDVERSION, EPOCH):
+        self.tools.saveCheckpoint(VERSION, COMPLETEDVERSION, EPOCH, self.model)
+
+    def getFinalVersion(self, VERSION):
+        return self.tools.getFinalLatestVersion(VERSION)
+
+    def getCheckpointVersion(self, VERSION, COMPLETEDVERSION):
+        return self.tools.getCheckpointLatestVersion(VERSION, COMPLETEDVERSION)
+
+    def saveStatus(self, fileVersion, VERSION):
+        self.tools.saveStatus(fileVersion, VERSION)
+
+    def saveConfigModel(self, dict, VERSION):
+        self.tools.saveConfigModel(dict, VERSION)
+
+
+class ModelDQN(Tools):
+    def __init__(self, state_size, action_size):
+        super().__init__()
+        
+        self.state_size = state_size
+        self.action_size = action_size
+        self._build_model()
+
+    def _build_model(self):
         self.model = models.Sequential()
         self.model.add(Input(shape=[self.state_size], dtype="uint8"))
         self.model.add(layers.Dense(LAYERS, activation="relu"))
         self.model.add(layers.Dense(self.action_size, activation="linear"))
+
+        if platform.system() == "Darwin" and platform.processor() == "arm":
+            opt = tf.keras.optimizers.legacy.Adam(learning_rate=0.01)
+        else:
+            opt = tf.keras.optimizers.Adam(learning_rate=0.01)
+
+        self.model.compile(loss="mse", optimizer=opt, metrics=["accuracy"])
+        self.model.summary()
+
+    def act(self, state, epsilon, action_size):
+        if np.random.rand() <= epsilon:
+            return random.randrange(action_size)
+        return self.predict(state)
+
+    def remember(self, state, action, reward, next_state, done, memory):
+        memory.append((state, action, reward, next_state, done))
+
+    def predict(self, state):
+        return np.argmax(
+            self.model.predict(state, verbose=VERBOSETRAIN, use_multiprocessing=True)[0]
+        )

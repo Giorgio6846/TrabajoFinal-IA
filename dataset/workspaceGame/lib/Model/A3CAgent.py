@@ -28,13 +28,13 @@ EPISODE = 0
 class Actor:
     def __init__(self, state_size, action_size):
         self.ModelClass = ModelA3C(state_size, action_size)
-        self.ModelClass._build_modelActor()
 
         self.entropy_beta = 0.01
         if platform.system() == "Darwin" and platform.processor() == "arm":
             self.opt = tf.keras.optimizers.legacy.Adam(learning_rate=LR_Actor)
         else:
             self.opt = tf.keras.optimizers.Adam(learning_rate=LR_Actor)
+        self.ModelClass._build_modelActor(self.opt)
 
     def compute_loss(self, actions, logits, advantages):
         ce_loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
@@ -57,12 +57,12 @@ class Actor:
 class Critic:
     def __init__(self, state_size, action_size):
         self.ModelClass = ModelA3C(state_size, action_size)
-        self.ModelClass._build_modelCritic()
         self.entropy_beta = 0.01
         if platform.system() == "Darwin" and platform.processor() == "arm":
             self.opt = tf.keras.optimizers.legacy.Adam(learning_rate=LR_Critic)
         else:
             self.opt = tf.keras.optimizers.Adam(learning_rate=LR_Critic)
+        self.ModelClass._build_modelCritic(self.opt)
 
     def compute_loss(self, v_pred, td_targets):
         mse = tf.keras.losses.MeanSquaredError()
@@ -81,8 +81,8 @@ class Worker(Thread):
         Thread.__init__(self)
         self.lock = Lock()
         self.env = env
-        self.state_dim = self.env.observation_space.shape[0]
-        self.action_dim = self.env.action_space.n
+        self.state_dim = self.env.state_size
+        self.action_dim = self.env.action_size
         
         self.max_episodes = max_episodes
         self.global_actor = global_actor
@@ -122,11 +122,11 @@ class Worker(Thread):
             reward_batch = []
             episode_reward, done = 0, False
             
-            self.env.reset()
+            self.env.reset(5)
             state = self.env.get_obs()
             
             while not done:
-                probs = self.actor.ModelClass.model.predict(np.reshape, [1,self.state_dim])
+                probs = self.actor.ModelClass.model.predict(np.reshape(state, [1,self.state_dim]))
                 action = np.random.choice(self.action_dim, p=probs[0])
             
                 state, action, reward, next_state, done = self.env.step(action)
@@ -151,10 +151,10 @@ class Worker(Thread):
                     advantages = td_targets - self.critic.ModelClass.model.predict(states)
                     
                     with self.lock:
-                        actor_loss = self.global_actor.train(
+                        actor_loss = self.global_actor.ModelClass.model.train(
                             states, actions, advantages
                         )
-                        critic_loss = self.global_critic.train(
+                        critic_loss = self.global_critic.ModelClass.model.train(
                             states, td_targets
                         )
                         
@@ -177,9 +177,9 @@ class Worker(Thread):
                 
             print(f'Episode {EPISODE} Episode Reward={episode_reward}')
             EPISODE += 1
-        
-        def run(self):
-            self.train()
+    
+    def run(self):
+        self.train()
             
 class Agent:
     def __init__(self):
@@ -197,11 +197,10 @@ class Agent:
 
         for i in range(self.num_workers):
             env = BJEnvironment()
+            workers.append(Worker(env, self.global_actor, self.global_critic, max_episodes))
             
-            workers.append(Worker(env, self.global_actor.ModelClass.model, self.global_critic.ModelClass.model, max_episodes))
+        for worker in workers:
+            worker.start()
             
-            for worker in workers:
-                worker.start()
-                
-            for worker in workers:
-                worker.join()
+        for worker in workers:
+            worker.join()
