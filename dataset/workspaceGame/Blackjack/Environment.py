@@ -16,7 +16,7 @@ class BJEnvironment(gym.Env):
         # Hit, Stand, Split, Double
         self.action_size = 2
 
-        self.observation_space = spaces.Box(low=np.array([4,4,0,0,0,1,0]), high=np.array([30,30,1,1,1,9,2]), shape=(self.state_size,), dtype=np.uint8)
+        self.observation_space = spaces.Box(low=np.array([4,4,0,0,0,0,0]), high=np.array([30,30,1,1,1,9,2]), shape=(self.state_size,), dtype=np.uint8)
         self.action_space = spaces.Discrete(self.action_size)
 
     @staticmethod
@@ -44,44 +44,43 @@ class BJEnvironment(gym.Env):
         bet = self.game.bet_game
         status = self.game.player_action(act_string)
 
-        if status[1] == "continue":
-            reward = 0
-            done = 0
+        reward = 0
+        done = 0
 
-            bet = self.game.return_bounty(self.bet, act_string)
+        bet = self.game.return_bounty(self.bet, act_string)
+
+        if status[1] == "continue":
 
             if self.game.badMove:
                 reward = -5
-
-            if status[0] == "stay":
-                done = 1
-
-            if status[1] == "player_blackjack":
-                reward = bet / self.game.bet_game
-            elif status[1] == "player_bust":
-                reward = -bet / self.game.bet_game
-
-            if not done:
-                done = status[1] in ["player_blackjack", "player_bust"]
+                done = True
 
             return state, action, reward, self.get_obs(), done
-        
-        final_result = self.get_final_result()
-        
-        final_reward = (
-            self.game.bet_game
-            if final_result == "win"
-            else (-self.game.bet_game if final_result == "loss" else 0)
-        )
+
+        #Si cuando el jugador o el dealer tienen 21 en la primera no obtiene recompensa
+        if self.game.firstTurn:
+            reward = 0
+        else:
+            if status[1] == "win":
+                reward = bet / self.game.bet_game
+
+            if status[1] == "loss":
+                reward = -bet/self.game.bet_game
+
+        if status[1] == "draw":
+            reward = 0
+
         print(self.game.game_result())
-        print("END")
-        print("Player Cards:")
-        print(self.game.format_cards(self.game.player_hand), "   ", self.game.hand_value(self.game.player_hand))
+        
+        #print("END")
+        
+        #print("Player Cards:")
+        #rint(self.game.format_cards(self.game.player_hand), "   ", self.game.hand_value(self.game.player_hand))
 
-        print("Dealer Cards:")
-        print(self.game.format_cards(self.game.dealer_hand), "   ", self.game.hand_value(self.game.dealer_hand))
+        #print("Dealer Cards:")
+        #print(self.game.format_cards(self.game.dealer_hand), "   ", self.game.hand_value(self.game.dealer_hand))
 
-        return state, action, final_reward, self.get_obs(), True
+        return state, action, reward, self.get_obs(), True
 
     def get_obs(self):
         # player_sum, dealer_sum, usable_ace, split_pos, double_pos, prob_21, game_state
