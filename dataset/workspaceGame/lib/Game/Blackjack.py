@@ -57,7 +57,7 @@ class BlackjackGame:
         self.current_hand_index = 0
         self.status = 0
         self.badMove = False
-        self.game_status = "continue"
+        self.game_status = ["act","continue"]
 
         # This is only true when it has been selected split and the first maze has blown
         self.handLose = False
@@ -83,52 +83,53 @@ class BlackjackGame:
 
     # todas las acciones que puede realizar el jugador
     def player_action(self, action):
-        if not (self.__checkBlackjack() or self.__checkBlowCards()):
-            self.badMove = False
-            self.firstTurn = False
-            # "Hit" automaticamente se introduce una carta de la baraja a la mano del jugador y se borra una carta del array del mazo.
-            if action == "hit":
-                self.player_hand.append(self.deal_card())
-            # "Double" cuando se dobla el tamaño de la apuesta, pero solo se obtiene una carta mas y la accion pasa a automaticamente a "stay"
-            elif action == "double":
-                self.bet_game *= 2
-                self.player_hand.append(self.deal_card())
-                self.status = 2
-                action = "stay"
-            # "Split" divide la mano del jugador en 2, doblando la apuesta (solo aplica cuando la mano del jugador cuenta con 2 cartas del mismo numero)
-            elif action == "split":
-                if len(self.player_hand) == 2 and self.player_hand[0]['number'] == self.player_hand[1]['number']:
-                    self.splitted_hands = [[self.player_hand[0]], [self.player_hand[1]]]
-                    if self.splitted_done:
-                        self.player_hand = self.splitted_hands[1]
-                    else:
-                        self.player_hand = self.splitted_hands[0]
-                        self.splitted_done = True
-
-                    self.splitted_hands[0].append(self.deal_card())
-                    self.splitted_hands[1].append(self.deal_card())
-                    self.bet_game *= 2
-                    self.status = 1
-
+        # "Hit" automaticamente se introduce una carta de la baraja a la mano del jugador y se borra una carta del array del mazo.
+        if action == "hit":
+            self.player_hand.append(self.deal_card())
+            if self.hand_value(self.player_hand) > 21:
+                self.game_status[0] = "stay"
+        # "Double" cuando se dobla el tamaño de la apuesta, pero solo se obtiene una carta mas y la accion pasa a automaticamente a "stay"
+        elif action == "double":
+            self.bet_game *= 2
+            self.player_hand.append(self.deal_card())
+            self.status = 2
+            self.game_status[0] = "stay"
+        # "Split" divide la mano del jugador en 2, doblando la apuesta (solo aplica cuando la mano del jugador cuenta con 2 cartas del mismo numero)
+        elif action == "split":
+            if len(self.player_hand) == 2 and self.player_hand[0]['number'] == self.player_hand[1]['number']:
+                self.splitted_hands = [[self.player_hand[0]], [self.player_hand[1]]]
+                if self.splitted_done:
+                    self.player_hand = self.splitted_hands[1]
                 else:
-                    print("El split solo es permitido con 2 cartas del mismo valor en la mano")
-                    self.badMove = True
+                    self.player_hand = self.splitted_hands[0]
+                    self.splitted_done = True
 
-            if action == "stay" and self.game_status == "continue":
-                self.dealer_action()
-                if self.__checkWinner():
-                    return action, self.game_status
+                self.splitted_hands[0].append(self.deal_card())
+                self.splitted_hands[1].append(self.deal_card())
+                self.bet_game *= 2
+                self.status = 1
 
-            if not self.__checkBlackjack() or self.__checkBlowCards():
-                self.game_status = "continue"
+            else:
+                print("El split solo es permitido con 2 cartas del mismo valor en la mano")
+                self.badMove = True
+            
+        if action == "stay" or self.game_status[0] == "stay" and self.game_status[1] == "continue":
+            if self.__checkWinner():
+                return action, self.game_status[1]
 
-        return action, self.game_status
+        if not self.__checkBlackjack() or self.__checkBlowCards():
+            self.game_status[1] = "continue"
+
+        return action, self.game_status[1]
 
     # funcion para retornar el valor de la apuesta, en caso de que se doble o se haga split.
     def return_bounty(self, bet, action):
         if(action == "double" or action == "split"):
             return bet*2
         return bet
+
+    def check_winner(self):
+        return self.__checkWinner()
 
     # se hace la funcion para que el dealer tome cartas en caso de que la suma de su mano sea menor a 17
     def dealer_action(self):
@@ -153,17 +154,21 @@ class BlackjackGame:
             player_hand = self.player_hand
         else:
             player_hand = self.game.splitted_hands[1]
-
         if self.hand_value(player_hand) == self.hand_value(self.dealer_hand):
-            self.game_status = "draw"
+            self.game_status[1] = "draw"
             return True
         elif self.hand_value(player_hand) > self.hand_value(self.dealer_hand):
-            self.game_status = "win"
+            self.game_status[1] = "win"
+            if self.status == 2:
+                self.game_status[1] = "win_double"
             return True
         elif self.hand_value(player_hand) < self.hand_value(self.dealer_hand):
-            self.game_status = "loss"
+            self.game_status[1] = "loss"
+            if self.status == 2:
+                self.game_status[1] = "loss_double"
             return True
         return False
+
 
     # If true it means the game has ended
     def __checkBlackjack(self):
@@ -171,18 +176,22 @@ class BlackjackGame:
             player_hand = self.player_hand
         else:
             player_hand = self.game.splitted_hands[1]
-
+        
         if (
             self.hand_value(player_hand) == 21
             and self.hand_value(self.dealer_hand) == 21
         ):
-            self.game_status = "draw"
+            self.game_status[1] = "draw"
             return True
         elif self.hand_value(player_hand) == 21:
-            self.game_status = "win"
+            self.game_status[1] = "win"
+            if self.status == 2:
+                self.game_status[1] = "win_double"
             return True
         elif self.hand_value(self.dealer_hand) == 21:
-            self.game_status = "loss"
+            self.game_status[1] = "loss"
+            if self.status == 2:
+                self.game_status[1] = "loss_double"
             return True
 
         return False
@@ -192,25 +201,28 @@ class BlackjackGame:
             player_hand = self.player_hand
         else:
             player_hand = self.game.splitted_hands[1]
-
         if (
             self.hand_value(player_hand) > 21
             and self.hand_value(self.dealer_hand) > 21
         ):
-            self.game_status = "draw"
+            self.game_status[1] = "draw"
             return True
         elif self.hand_value(player_hand) > 21:
-            self.game_status = "loss"
+            self.game_status[1] = "loss"
+            if self.status == 2:
+                self.game_status[1] = "loss_double"
             return True
         elif self.hand_value(self.dealer_hand) > 21:
-            self.game_status = "win"
+            self.game_status[1] = "win"
+            if self.status == 2:
+                self.game_status[1] = "win_double"
             return True
 
         return False
 
     # Se obtienen los valores de las manos del dealer y del jugador y se comparan
     def game_result(self):
-        return self.game_status
+        return self.game_status[1]
 
     # formato para imprimir cartas
     @staticmethod
@@ -249,14 +261,13 @@ def main():
 
         if action == "stay":
             break
+        
+    print("Player has:", game.format_cards(game.player_hand), game.hand_value(game.player_hand))
+    game.dealer_action()
+    print("Dealer has:", game.format_cards(game.dealer_hand), game.hand_value(game.dealer_hand))
+    game.check_winner()
 
-    if status == "continue":
-        print("Dealer has:", game.format_cards(game.dealer_hand), game.hand_value(game.dealer_hand))
-        game.dealer_action()
-
-    game.__checkWinner()
-
-    print(game.game_status)
+    print(game.game_status[1])
 
 if __name__ == "__main__":
     main()

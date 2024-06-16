@@ -38,8 +38,9 @@ if __name__ == "__main__":
     TestClass.ModelClass.loadModel(VERSION, COMPLETEDVERSION)
         
     # Evaluate the agent
-    test_games = 5000
-    wins, losses, draws, nf = 0, 0, 0, 0
+    test_games = 1000
+    wins, losses, draws, nf, win_double = 0, 0, 0, 0, 0
+    budget = 1000
 
     for index in range(1, test_games):
         print("-----")
@@ -49,13 +50,19 @@ if __name__ == "__main__":
         print(result)
         if result == "win":
             wins += 1
+            budget += 5
         elif result == "loss":
             losses += 1
+            budget -= 5
         elif result == "draw":
             draws += 1
+        elif result == "win_double":
+            win_double += 1
+            budget += 10
         elif result == "badmove":
             nf += 1
 
+    print(f"Total budget: {budget}")
     print(f"Wins: {wins}, Losses: {losses}, Draws: {draws}")
     print(f"Win rate: {wins / (wins + losses) * 100:.2f}%")
     print(f"Not Finished: {nf}")
