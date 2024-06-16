@@ -39,7 +39,7 @@ class BJEnvironment(gym.Env):
         return final_result
 
     def step(self, action):
-        act_string = ["hit", "stay", "double", "split"][action]
+        act_string = ["hit", "stay", "split", "double"][action]
         state = self.get_obs()
         bet = self.game.bet_game
         status = self.game.player_action(act_string)
@@ -57,7 +57,7 @@ class BJEnvironment(gym.Env):
 
             return state, action, reward, self.get_obs(), done
 
-        #Si cuando el jugador o el dealer tienen 21 en la primera no obtiene recompensa
+        # Si cuando el jugador o el dealer tienen 21 en la primera no obtiene recompensa
         if self.game.firstTurn:
             reward = 0
         else:
@@ -71,14 +71,14 @@ class BJEnvironment(gym.Env):
             reward = 0
 
         print(self.game.game_result())
-        
-        #print("END")
-        
-        #print("Player Cards:")
-        #rint(self.game.format_cards(self.game.player_hand), "   ", self.game.hand_value(self.game.player_hand))
 
-        #print("Dealer Cards:")
-        #print(self.game.format_cards(self.game.dealer_hand), "   ", self.game.hand_value(self.game.dealer_hand))
+        # print("END")
+
+        # print("Player Cards:")
+        # rint(self.game.format_cards(self.game.player_hand), "   ", self.game.hand_value(self.game.player_hand))
+
+        # print("Dealer Cards:")
+        # print(self.game.format_cards(self.game.dealer_hand), "   ", self.game.hand_value(self.game.dealer_hand))
 
         return state, action, reward, self.get_obs(), True
 

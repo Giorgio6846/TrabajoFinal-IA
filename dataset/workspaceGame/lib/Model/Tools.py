@@ -116,89 +116,31 @@ class Tools:
             os.makedirs(os.path.dirname(path))
 
 
-class ModelA3C:
+class ModelA3C(Tools):
     def __init__(self, state_size, action_size):
-        self.tools = 1
-        self.model = 1
+        super().__init__()
 
         self.state_size = state_size
         self.action_size = action_size
 
-    def _build_modelCritic(self, opt):
+    def _build_modelCritic(self):
         self.model = models.Sequential()
         self.model.add(Input(shape=[self.state_size], dtype="uint8"))
         self.model.add(layers.Dense(LAYERS, activation="relu"))
         self.model.add(layers.Dense(LAYERS/2, activation="relu"))
         self.model.add(layers.Dense(self.action_size, activation="linear"))
 
-        self.model.compile(loss="mse", optimizer=opt, metrics=["accuracy"])
-        self.model.summary()
+        #self.model.compile(loss="mse", optimizer=opt, metrics=["accuracy"])
+        #self.model.summary()
 
-        self.tools = Tools(self.model)
-
-    def loadModel(self, VERSION, COMPLETEDVERSION):
-        self.model = self.tools.saveModel(VERSION, COMPLETEDVERSION)
-
-    def saveModel(self, VERSION, COMPLETEDVERSION):
-        self.tools.saveModel(VERSION, COMPLETEDVERSION, self.model)
-
-    def loadCheckpoint(self, VERSION, COMPLETEDVERSION, EPOCH):
-        self.model = self.tools.loadCheckpoint(
-            VERSION, COMPLETEDVERSION, EPOCH, self.model
-        )
-
-    def saveCheckpoint(self, VERSION, COMPLETEDVERSION, EPOCH):
-        self.tools.saveCheckpoint(VERSION, COMPLETEDVERSION, EPOCH, self.model)
-
-    def getFinalVersion(self, VERSION):
-        return self.tools.getFinalLatestVersion(VERSION)
-
-    def getCheckpointVersion(self, VERSION, COMPLETEDVERSION):
-        return self.tools.getCheckpointLatestVersion(VERSION, COMPLETEDVERSION)
-
-    def saveStatus(self, fileVersion, VERSION):
-        self.tools.saveStatus(fileVersion, VERSION)
-
-    def saveConfigModel(self, dict, VERSION):
-        self.tools.saveConfigModel(dict, VERSION)
-
-    def _build_modelActor(self, opt):
+    def _build_modelActor(self):
         self.model = models.Sequential()
         self.model.add(Input(shape=[self.state_size], dtype="uint8"))
         self.model.add(layers.Dense(LAYERS, activation="relu"))
         self.model.add(layers.Dense(self.action_size, activation="softmax"))
 
-        self.model.compile(loss="mse", optimizer=opt, metrics=["accuracy"])
-        self.model.summary()
-
-        self.tools = Tools(self.model)
-
-    def loadModel(self, VERSION, COMPLETEDVERSION):
-        self.model = self.tools.saveModel(VERSION, COMPLETEDVERSION)
-
-    def saveModel(self, VERSION, COMPLETEDVERSION):
-        self.tools.saveModel(VERSION, COMPLETEDVERSION, self.model)
-
-    def loadCheckpoint(self, VERSION, COMPLETEDVERSION, EPOCH):
-        self.model = self.tools.loadCheckpoint(
-            VERSION, COMPLETEDVERSION, EPOCH, self.model
-        )
-
-    def saveCheckpoint(self, VERSION, COMPLETEDVERSION, EPOCH):
-        self.tools.saveCheckpoint(VERSION, COMPLETEDVERSION, EPOCH, self.model)
-
-    def getFinalVersion(self, VERSION):
-        return self.tools.getFinalLatestVersion(VERSION)
-
-    def getCheckpointVersion(self, VERSION, COMPLETEDVERSION):
-        return self.tools.getCheckpointLatestVersion(VERSION, COMPLETEDVERSION)
-
-    def saveStatus(self, fileVersion, VERSION):
-        self.tools.saveStatus(fileVersion, VERSION)
-
-    def saveConfigModel(self, dict, VERSION):
-        self.tools.saveConfigModel(dict, VERSION)
-
+        #self.model.compile(loss="mse", optimizer=opt, metrics=["accuracy"])
+        #self.model.summary()
 
 class ModelDQN(Tools):
     def __init__(self, state_size, action_size):
