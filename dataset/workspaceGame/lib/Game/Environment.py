@@ -12,10 +12,8 @@ class BJEnvironment(gym.Env):
         # player_sum, dealer_sum, usable_ace, has_split, has_double, prob_21, game_state
         # game_state = 0 normal, 1 split, 2 double
         self.state_size = 7
-
         # Hit, Stand, Split, Double
         self.action_size = 2
-
         self.observation_space = spaces.Box(low=np.array([4,4,0,0,0,0,0]), high=np.array([30,30,1,1,1,9,2]), shape=(self.state_size,), dtype=np.uint8)
         self.action_space = spaces.Discrete(self.action_size)
 
@@ -34,6 +32,9 @@ class BJEnvironment(gym.Env):
     def get_badmove(self):
         return self.game.badMove
 
+    def set_deck_per_game(self, deck):
+        self.used_carts = np.copy(deck)
+
     def get_final_result(self):
         final_result = self.game.game_result()
         return final_result
@@ -48,6 +49,9 @@ class BJEnvironment(gym.Env):
         done = 0
 
         bet = self.game.return_bounty(self.bet, act_string)
+
+        if done or self.game.badMove:
+            self.set_deck_per_game()
 
         if status[1] == "continue":
 
@@ -79,7 +83,6 @@ class BJEnvironment(gym.Env):
 
         # print("Dealer Cards:")
         # print(self.game.format_cards(self.game.dealer_hand), "   ", self.game.hand_value(self.game.dealer_hand))
-
         return state, action, reward, self.get_obs(), True
 
     def get_obs(self):
@@ -94,7 +97,7 @@ class BJEnvironment(gym.Env):
             and self.game.player_hand[0]["number"] == self.game.player_hand[1]["number"]
         )
         has_double = self.game.firstTurn
-        prob_21 = self.game.get_prob_of21()
+        prob_21 = self.game.get_prob_of_bust(self.used_carts)
         game_state = self.game.status
 
         if game_state == 1 and player_sum > 21:
@@ -118,6 +121,9 @@ class BJEnvironment(gym.Env):
     def reset(self, bet):
 
         self.bet = bet
+        
+        if(len(self.game.get_deck()) == 312):
+            self.set_deck_per_game(self.game.get_deck())
 
         if (len(self.game.get_deck()) <= self.deck_min_len):
             self.game.regenerate_deck()

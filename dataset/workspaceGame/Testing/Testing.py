@@ -4,7 +4,8 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from lib.Game.Environment import BJEnvironment
-from lib.Model.Tools import ModelDQN, Tools
+from lib.Model.Tools import ModelDQN
+
 
 VERSION = 1
 COMPLETEDVERSION = 1

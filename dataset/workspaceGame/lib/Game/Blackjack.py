@@ -115,8 +115,8 @@ class BlackjackGame:
             
         if action == "stay" or self.game_status[0] == "stay" and self.game_status[1] == "continue":
             self.dealer_action()
-            if self.__checkWinner():
-                return action, self.game_status[1]
+            self.check_winner()
+            return action, self.game_status[1]
 
         if not self.__checkBlackjack() or self.__checkBlowCards():
             self.game_status[1] = "continue"
@@ -235,17 +235,29 @@ class BlackjackGame:
 
         return result.strip()
 
-    def get_prob_of21(self):
-        amountNeeded = 21 - self.hand_value(self.player_hand)
-        prob = abs(100 * amountNeeded / 21)
+    def get_prob_of_bust(self, remaining_deck):
+        value_needed = 21 - self.hand_value(self.player_hand)
+        if value_needed < 0:
+            return -1
+        if value_needed == 0:
+            return 100  # Si ya está en 21 o más, la probabilidad de volar es del 100%
+        busting_cards = 0
+        for card in remaining_deck:
+            card_value = card['number']
+            if card_value in ['J', 'Q', 'K']:
+                card_value = 10
+            elif card_value == 'A':
+                card_value = 11
+            else:
+                card_value = int(card_value)
 
-        prob = prob / 10
-        prob = round(prob, 3)
+            if card_value > value_needed:
+                busting_cards += 1
 
-        if prob > 10:
-            prob = 10
+        total_cards = len(remaining_deck)
+        probability_of_bust = (busting_cards / total_cards) * 100
 
-        return prob
+        return int(probability_of_bust)
 
 def main():
     game = BlackjackGame()
@@ -263,7 +275,6 @@ def main():
         if action == "stay":
             break
     print("Player has:", game.format_cards(game.player_hand), game.hand_value(game.player_hand))
-    game.dealer_action()
     print("Dealer has:", game.format_cards(game.dealer_hand), game.hand_value(game.dealer_hand))
     game.check_winner()
 
