@@ -114,6 +114,7 @@ class BlackjackGame:
                 self.badMove = True
             
         if action == "stay" or self.game_status[0] == "stay" and self.game_status[1] == "continue":
+            self.dealer_action()
             if self.__checkWinner():
                 return action, self.game_status[1]
 
@@ -261,7 +262,6 @@ def main():
 
         if action == "stay":
             break
-        
     print("Player has:", game.format_cards(game.player_hand), game.hand_value(game.player_hand))
     game.dealer_action()
     print("Dealer has:", game.format_cards(game.dealer_hand), game.hand_value(game.dealer_hand))
