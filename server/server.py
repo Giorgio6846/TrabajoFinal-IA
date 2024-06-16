@@ -4,11 +4,14 @@ import time
 import zmq
 import json
 
-#import CardDetection.OBMod
+import CardDetection.OBMod
 
 context = zmq.Context()
 socket = context.socket(zmq.REP)
 socket.bind("tcp://*:5555")
+
+
+file_path = os.path.join(os.path.dirname(__file__), "screenshots", "received_image.png")
 
 class Server:
     def __init__(self):
@@ -19,7 +22,6 @@ class Server:
             if "image" in message:
                 self.process_image(message["image"])
                 file_path = os.path.join(os.path.dirname(__file__), "screenshots", "received_image.png")
-                #CardDetection.OBMod(file_path)
                 socket.send_string(json.dumps({"response": "image processed"}))
             else:
                 socket.send_string(json.dumps({"response": "unknown type"}))
@@ -29,7 +31,6 @@ class Server:
     def process_image(self, base64_string):
         try:
             image_data = base64.b64decode(base64_string)
-            file_path = os.path.join(os.path.dirname(__file__), "screenshots", "received_image.png")
             with open(file_path, "wb") as f:
                 f.write(image_data)
             return True
@@ -43,6 +44,7 @@ server = Server()
 print("Server ready")
 
 while True:
+    CardDetection.OBMod.detectCard(file_path)
     try:
         message = socket.recv_json()
         print("Received request: %s" % type(message))
