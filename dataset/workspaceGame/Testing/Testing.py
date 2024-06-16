@@ -61,8 +61,8 @@ if __name__ == "__main__":
             budget += 10
         elif result == "badmove":
             nf += 1
-
-    print(f"Total budget: {budget}")
+    total_profit = budget - 1000
+    print(f"Total profit: {total_profit}")
     print(f"Wins: {wins}, Losses: {losses}, Draws: {draws}")
     print(f"Win rate: {wins / (wins + losses) * 100:.2f}%")
     print(f"Not Finished: {nf}")
