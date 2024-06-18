@@ -3,7 +3,7 @@ import numpy as np
 import random
 import tensorflow as tf
 
-from .Tools import Model
+from .Tools import ModelDQN
 
 VERBOSETRAIN = 1
 LOGSPATH = "./models/v{VERSION}/logs"
@@ -34,7 +34,7 @@ class DQNAgent:
 
         # DQN Config
         self.memory = deque(maxlen=2000)  # Aquí se define la memoria de repetición
-        self.ModelClass = Model(self.state_size, self.action_size)
+        self.ModelClass = ModelDQN(self.state_size, self.action_size)
 
         # Save Config
         self.version = VERSION
@@ -50,7 +50,7 @@ class DQNAgent:
                 "gamma": self.gamma,
                 "epsilon": self.epsilon,
                 "epsilon_min": self.epsilon_min,
-                "epsilon_min": self.epsilon_decay
+                "epsilon_decay": self.epsilon_decay
             }
         )
 

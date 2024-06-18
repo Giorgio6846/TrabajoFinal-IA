@@ -7,9 +7,9 @@ from lib.Model.Agent import DQNAgent
 from lib.Game.Environment import BJEnvironment
 from lib.Model.Tools import LAYERS
 
-VERSION = 1
+VERSION = 2
 COMPLETEDVERSION = 1
-EPOCH = 1
+EPOCH = 12
 
 SAVEEVERY = 250
 
