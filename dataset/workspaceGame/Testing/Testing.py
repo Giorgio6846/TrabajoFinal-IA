@@ -7,9 +7,9 @@ from lib.Game.Environment import BJEnvironment
 from lib.Model.Tools import ModelDQN
 
 
-VERSION = 1
-COMPLETEDVERSION = 1
-VERBOSETRAIN = 6
+VERSION = 2
+COMPLETEDVERSION = 2
+VERBOSETRAIN = 1
 
 class Test:
     def __init__(self):

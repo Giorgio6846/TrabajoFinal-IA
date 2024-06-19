@@ -25,6 +25,7 @@ if __name__ == "__main__":
     agent.ModelClass.saveConfigModel(configDict, VERSION)
 
     COMPLETEDVERSION = agent.ModelClass.getFinalLatestVersion(VERSION)
+    print(COMPLETEDVERSION)
     
     if COMPLETEDVERSION != 1:
         agent.ModelClass.loadModel(VERSION, COMPLETEDVERSION-1)
