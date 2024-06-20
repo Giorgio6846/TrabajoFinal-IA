@@ -4,4 +4,3 @@ Observations:
 
 Model trained on Apple M2 NPU
 Batch Size 16000
-Time: 

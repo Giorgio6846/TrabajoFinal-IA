@@ -1,4 +1,5 @@
 import os
+from pytz import VERSION
 from tensorflow.keras import layers, models, Input
 import tensorflow as tf
 import numpy as np
@@ -7,6 +8,7 @@ import platform
 
 VERBOSETRAIN = 0
 LAYERS = 256
+LOGSPATH = "./models/v{VERSION}/logs"
 
 class Tools:
     def __init__(self):
@@ -145,7 +147,7 @@ class ModelA3C(Tools):
 class ModelDQN(Tools):
     def __init__(self, state_size, action_size):
         super().__init__()
-        
+
         self.state_size = state_size
         self.action_size = action_size
         self._build_model()
@@ -169,10 +171,21 @@ class ModelDQN(Tools):
             return random.randrange(action_size)
         return self.predict(state)
 
-    def remember(self, state, action, reward, next_state, done, memory):
-        memory.append((state, action, reward, next_state, done))
-
     def predict(self, state):
         return np.argmax(
             self.model.predict(state, verbose=VERBOSETRAIN, use_multiprocessing=True)[0]
         )
+
+    def modelFit(self, state, target_f, VERBOSE, STT, version):
+        callbacks = tf.keras.callbacks.TensorBoard(
+            log_dir=LOGSPATH.format(VERSION=version),
+            histogram_freq=0,
+            write_graph=True,
+        )
+
+        if STT:       
+            self.model.fit(state, target_f, epochs = 1, verbose=VERBOSE, use_multiprocessing = True, callbacks=callbacks)
+        else:
+            self.model.fit(
+                state, target_f, epochs=1, verbose=VERBOSE, use_multiprocessing=True
+            )

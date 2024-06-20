@@ -1,3 +1,4 @@
+from calendar import EPOCH
 import sys
 import os
 
@@ -6,10 +7,10 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from lib.Game.Environment import BJEnvironment
 from lib.Model.Tools import ModelDQN
 
-
-VERSION = 2
-COMPLETEDVERSION = 2
-VERBOSETRAIN = 1
+VERSION = 3
+COMPLETEDVERSION = 1
+VERBOSETRAIN = 60
+EPOCH = 21
 
 class Test:
     def __init__(self):
@@ -36,7 +37,8 @@ class Test:
 
 if __name__ == "__main__":
     TestClass = Test()
-    TestClass.ModelClass.loadModel(VERSION, COMPLETEDVERSION)
+    #TestClass.ModelClass.loadModel(VERSION, COMPLETEDVERSION)
+    TestClass.ModelClass.loadCheckpoint(VERSION, COMPLETEDVERSION, EPOCH)
         
     # Evaluate the agent
     test_games = 1000
@@ -66,4 +68,4 @@ if __name__ == "__main__":
     print(f"Total profit: {total_profit}")
     print(f"Wins: {wins}, Losses: {losses}, Draws: {draws}")
     print(f"Win rate: {wins / (wins + losses) * 100:.2f}%")
-    print(f"Not Finished: {nf}")
+    print(f"Not Finished: {nf}")    

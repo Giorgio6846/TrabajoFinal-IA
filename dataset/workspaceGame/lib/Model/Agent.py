@@ -1,12 +1,12 @@
 from collections import deque
 import numpy as np
 import random
+from pytz import VERSION
 import tensorflow as tf
 
 from .Tools import ModelDQN
 
 VERBOSETRAIN = 1
-LOGSPATH = "./models/v{VERSION}/logs"
 
 BATCH_SIZE = 32
 ALPHA = 0.2
@@ -26,41 +26,48 @@ class DQNAgent:
 
         # HyperParameters
         self.batch_size = BATCH_SIZE
-        self.alpha = ALPHA
         self.gamma = 0.95  # factor de descuento para las recompensas futuras
         self.epsilon = 0.9  # tasa de exploración inicial
         self.epsilon_min = 0.05  # tasa de exploración mínima
-        self.epsilon_decay = 0.995  # factor de decaimiento de la tasa de exploración
+        self.annelingSteps = 10000
 
         # DQN Config
-        self.memory = deque(maxlen=2000)  # Aquí se define la memoria de repetición
+        self.memory = deque(maxlen=10000)  # Aquí se define la memoria de repetición
         self.ModelClass = ModelDQN(self.state_size, self.action_size)
 
         # Save Config
         self.version = VERSION
 
         # Debug Config
-        self.SaveToTensorboard = False       
+        self.SaveToTensorboard = False
+
+        self.calcStepDrop()
+
+    def calcStepDrop(self):
+        self.epsilonDecay = (self.epsilon - self.epsilon_min) / self.annelingSteps      
+
+    def remember(self, state, action, reward, next_state, done):
+        self.memory.append((state, action, reward, next_state, done))
 
     def getHyperparameters(self):
         return dict(
             {
                 "batch_size": self.batch_size,
-                "alpha": self.alpha,
                 "gamma": self.gamma,
                 "epsilon": self.epsilon,
                 "epsilon_min": self.epsilon_min,
-                "epsilon_decay": self.epsilon_decay
+                "annelingSteps": self.annelingSteps
             }
         )
 
     def setHyperparameters(self, dictHyper):
         self.batch_size = dictHyper["batch_size"]
-        self.alpha = dictHyper["alpha"]
         self.gamma = dictHyper["gamma"]
         self.epsilon = dictHyper["epsilon"]
         self.epsilon_min = dictHyper["epsilon_min"]
-        self.epsilon_decay = dictHyper["epsilon_decay"]
+        self.annelingSteps = dictHyper["annelingSteps"]
+        
+        self.calcStepDrop()
 
     def replay(self, batch_size):
         minibatch = random.sample(self.memory, batch_size)
@@ -75,31 +82,10 @@ class DQNAgent:
             )
             target_f[0][action] = target
 
-            if self.SaveToTensorboard:
-                callbacks = tf.keras.callbacks.TensorBoard(
-                    log_dir=LOGSPATH.format(VERSION=self.version),
-                    histogram_freq=0,
-                    write_graph=True,
-                )
-                self.ModelClass.model.fit(
-                    state,
-                    target_f,
-                    epochs=1,
-                    verbose=VERBOSETRAIN,
-                    callbacks=callbacks,
-                    use_multiprocessing=True,
-                )
-            else:
-                self.ModelClass.model.fit(
-                    state,
-                    target_f,
-                    epochs=1,
-                    verbose=VERBOSETRAIN,
-                    use_multiprocessing=True,
-                )
+            self.ModelClass.modelFit(state, target_f, VERBOSETRAIN, self.SaveToTensorboard, self.version)
 
         if self.epsilon > self.epsilon_min:
-            self.epsilon *= self.epsilon_decay
+            self.epsilon -= self.epsilonDecay
 
     def train(self, env, STT):
         self.SaveToTensorboard = STT
@@ -113,8 +99,8 @@ class DQNAgent:
             )
             state, action, reward, next_state, done = env.step(action)
 
-            self.ModelClass.remember(
-                state, action, reward, next_state, done, self.memory
+            self.remember(
+                state, action, reward, next_state, done
             )
 
             if done or env.get_badmove():

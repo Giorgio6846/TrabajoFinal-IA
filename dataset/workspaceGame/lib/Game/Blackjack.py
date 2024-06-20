@@ -112,7 +112,7 @@ class BlackjackGame:
             else:
                 print("El split solo es permitido con 2 cartas del mismo valor en la mano")
                 self.badMove = True
-            
+
         if action == "stay" or self.game_status[0] == "stay" and self.game_status[1] == "continue":
             self.dealer_action()
             self.check_winner()
@@ -170,14 +170,13 @@ class BlackjackGame:
             return True
         return False
 
-
     # If true it means the game has ended
     def __checkBlackjack(self):
         if not self.handLose:  
             player_hand = self.player_hand
         else:
             player_hand = self.game.splitted_hands[1]
-        
+
         if (
             self.hand_value(player_hand) == 21
             and self.hand_value(self.dealer_hand) == 21
@@ -237,25 +236,34 @@ class BlackjackGame:
 
     def get_prob_of_bust(self, remaining_deck):
         value_needed = 21 - self.hand_value(self.player_hand)
-        if value_needed < 0:
-            return -1
-        if value_needed == 0:
-            return 100  # Si ya está en 21 o más, la probabilidad de volar es del 100%
-        busting_cards = 0
-        for card in remaining_deck:
-            card_value = card['number']
-            if card_value in ['J', 'Q', 'K']:
-                card_value = 10
-            elif card_value == 'A':
-                card_value = 11
-            else:
-                card_value = int(card_value)
+        # if value_needed < 0:
+        #    return -1
+        # if value_needed == 0:
+        #    return 100  # Si ya está en 21 o más, la probabilidad de volar es del 100%
+        # busting_cards = 0
+        # for card in remaining_deck:
+        #    card_value = card['number']
+        #    if card_value in ['J', 'Q', 'K']:
+        #        card_value = 10
+        #    elif card_value == 'A':
+        #        card_value = 11
+        #    else:
+        #        card_value = int(card_value)
 
-            if card_value > value_needed:
-                busting_cards += 1
+        #    if card_value > value_needed:
+        #        busting_cards += 1
 
-        total_cards = len(remaining_deck)
-        probability_of_bust = (busting_cards / total_cards) * 100
+        # total_cards = len(remaining_deck)
+        # probability_of_bust = (busting_cards / total_cards) * 100
+        # probability_of_bust = probability_of_bust/10
+
+        probability_of_bust = abs(100 * value_needed / 21)
+        probability_of_bust = probability_of_bust / 10
+
+        probability_of_bust = round(probability_of_bust)
+    
+        if probability_of_bust > 10:
+            probability_of_bust = 0        
 
         return int(probability_of_bust)
 

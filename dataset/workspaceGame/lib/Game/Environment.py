@@ -9,12 +9,12 @@ class BJEnvironment(gym.Env):
         self.game = BlackjackGame()
         self.deck_min_len = 109
 
-        # player_sum, dealer_sum, usable_ace, has_split, has_double, prob_21, game_state
+        # player_sum, dealer_sum, usable_ace, has_double, prob_21, game_state
         # game_state = 0 normal, 1 split, 2 double
-        self.state_size = 7
+        self.state_size = 6
         # Hit, Stand, Split, Double
         self.action_size = 2
-        self.observation_space = spaces.Box(low=np.array([4,4,0,0,0,0,0]), high=np.array([30,30,1,1,1,9,2]), shape=(self.state_size,), dtype=np.uint8)
+        self.observation_space = spaces.Box(low=np.array([4,4,0,0,0,0]), high=np.array([30,30,1,1,9,2]), shape=(self.state_size,), dtype=np.uint8)
         self.action_space = spaces.Discrete(self.action_size)
 
     @staticmethod
@@ -92,10 +92,10 @@ class BJEnvironment(gym.Env):
         if self.game.firstTurn:
             dealer_card = self.game.hand_value(self.game.dealer_hand[:1])
         usable_ace = self.has_usable_ace(self.game.player_hand)
-        has_split = (
-            len(self.game.player_hand) == 2
-            and self.game.player_hand[0]["number"] == self.game.player_hand[1]["number"]
-        )
+        #has_split = (
+        #    len(self.game.player_hand) == 2
+        #    and self.game.player_hand[0]["number"] == self.game.player_hand[1]["number"]
+        #)
         has_double = self.game.firstTurn
         prob_21 = self.game.get_prob_of_bust(self.used_carts)
         game_state = self.game.status
@@ -108,7 +108,7 @@ class BJEnvironment(gym.Env):
                 player_sum,
                 dealer_card,
                 usable_ace,
-                has_split,
+                #has_split,
                 has_double,
                 prob_21,
                 game_state,
