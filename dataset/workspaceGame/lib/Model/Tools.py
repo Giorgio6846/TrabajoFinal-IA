@@ -24,11 +24,11 @@ class Tools:
             and os.environ["TERM_PROGRAM"] == "vscode"
         ):
             self.checkpointPath = "./dataset/workspaceGame/GameModels/v{ver}/checkpoint_{comVer}/cp-{epoch:04d}.weights.h5"
-            self.modelPath = (
-                "./dataset/workspaceGame/GameModels/v{ver}/finished_{comVer}.keras"
-            )
             self.checkpointDir = (
                 "./dataset/workspaceGame/GameModels/v{ver}/checkpoint_{comVer}/"
+            )
+            self.modelPath = (
+                "./dataset/workspaceGame/GameModels/v{ver}/finished_{comVer}.keras"
             )
             self.modelDir = "./dataset/workspaceGame/GameModels/v{ver}/"
 
@@ -98,8 +98,12 @@ class Tools:
         return EPOCH
 
     def saveStatus(self, fileVersion, VERSION):
-        self.checkFolder("../GameModels/v{ver}/info.txt".format(ver=VERSION))
-        f = open("../GameModels/v{ver}/info.txt".format(ver=VERSION), "w")
+        self.checkFolder(
+            self.modelDir.format(ver=VERSION) + "config.txt".format(ver=VERSION)
+        )
+        f = open(
+            self.modelDir.format(ver=VERSION) + "config.txt".format(ver=VERSION), "w"
+        )
         if fileVersion == 1:
             f.write("Train based on SingleTraining")
         else:
@@ -107,8 +111,8 @@ class Tools:
         f.close()
 
     def saveConfigModel(self, dict, VERSION):
-        self.checkFolder("../GameModels/v{ver}/config.txt".format(ver=VERSION))
-        f = open("../GameModels/v{ver}/config.txt".format(ver=VERSION), "w")
+        self.checkFolder(self.modelDir.format(ver=VERSION)+"info.txt")
+        f = open(self.modelDir.format(ver=VERSION) + "info.txt", "w")
         for key, value in dict.items():
             f.write(f"{key}: {value} \n")
         f.close()
