@@ -7,9 +7,6 @@
 
   <body>
     <h1>Proyecto Inteligencia Artificial</h1>
-    <section>
-      <button id="screenshotBtn">Take Screenshot</button> <br />
-    </section>
     <section class="form">
       <form action="./mainPage" method="post">
         <label for="fname">Nombre:</label>
@@ -46,7 +43,11 @@
 
         <input type="submit" class="startProgram" value="Iniciar programa" />
       </form>
+      <button id="toggleScreenshotBtn">Toggle Screenshot</button>
+      <p id="screenshotStatus"></p>
     </section>
+    <script src="../scripts/manageScreenshot.js"></script>
+    <script src="../scripts/controlScreenshot.js"></script>
     <script src="../scripts/mouseDetector.js"></script>
     <script src="../scripts/manageScreenshot.js"></script>
   </body>
