@@ -7,10 +7,10 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from lib.Game.Environment import BJEnvironment
 from lib.Model.Tools import ModelDQN
 
-VERSION = 3
+VERSION = 4
 COMPLETEDVERSION = 1
 VERBOSETRAIN = 60
-EPOCH = 21
+EPOCH = 33
 
 class Test:
     def __init__(self):
@@ -29,7 +29,7 @@ class Test:
             action = self.ModelClass.predict(obs)
             state, action, reward, next_state, done = self.env.step(action)
 
-            if self.env.get_badmove:
+            if self.env.get_badmove():
                 done = True
 
         final_result = self.env.get_final_result()
@@ -37,8 +37,8 @@ class Test:
 
 if __name__ == "__main__":
     TestClass = Test()
-    #TestClass.ModelClass.loadModel(VERSION, COMPLETEDVERSION)
-    TestClass.ModelClass.loadCheckpoint(VERSION, COMPLETEDVERSION, EPOCH)
+    TestClass.ModelClass.loadModel(VERSION, COMPLETEDVERSION)
+    #TestClass.ModelClass.loadCheckpoint(VERSION, COMPLETEDVERSION, EPOCH)
         
     # Evaluate the agent
     test_games = 1000
