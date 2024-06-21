@@ -1,15 +1,16 @@
 import os
 import base64
 import time
+from sympy import proper_divisor_count
 import zmq
 import json
 
-import CardDetection.OBMod
+import server.CardDetection.model as cardModel
+import server.GamePrediction.model as gameModel
 
 context = zmq.Context()
 socket = context.socket(zmq.REP)
 socket.bind("tcp://*:5555")
-
 
 file_path = os.path.join(os.path.dirname(__file__), "screenshots", "received_image.png")
 
@@ -22,6 +23,12 @@ class Server:
             if "image" in message:
                 self.process_image(message["image"])
                 file_path = os.path.join(os.path.dirname(__file__), "screenshots", "received_image.png")
+
+                cardsDealer, cardsPlayer = cardModel.detectCards(file_path)
+                prediction = gameModel.gamePrediction(cardsDealer,cardsPlayer)
+
+                predictionArray = ["hit", "stay", "split", "double"][prediction]
+
                 socket.send_string(json.dumps({"response": "image processed"}))
             else:
                 socket.send_string(json.dumps({"response": "unknown type"}))
@@ -44,7 +51,6 @@ server = Server()
 print("Server ready")
 
 while True:
-    CardDetection.OBMod.detectCard(file_path)
     try:
         message = socket.recv_json()
         print("Received request: %s" % type(message))
