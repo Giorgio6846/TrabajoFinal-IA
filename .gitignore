@@ -3,8 +3,8 @@
 **/.ipynb_checkpoints
 **/__pycache__
 **/logs
-__pycache__/*.pyc[cod]
-**/*.DS_Store
-*.pyc
+__pycache__/*.pyc[od]
+**/.DS_Store
 *.DS_Store
-/.conda
+*.env
+*.conda
