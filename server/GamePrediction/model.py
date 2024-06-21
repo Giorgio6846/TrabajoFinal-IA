@@ -1,6 +1,3 @@
-import array
-from fnmatch import translate
-from sympy import true
 import tensorflow as tf
 import tensorflow.keras as models
 import numpy as np
