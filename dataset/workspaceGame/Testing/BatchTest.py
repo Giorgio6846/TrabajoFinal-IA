@@ -11,7 +11,7 @@ from Testing import Test
 # It requires to have a model finished
 
 # Insert version number
-VERSION = 3
+VERSION = 5
 
 # It tests the model every x amount
 TESTEVERY = 5
@@ -58,8 +58,8 @@ def TestModel(testClass):
             nf += 1
             dictValue = {"value": -10, "status": "badMove"}
         
-        df = pd.concat(df, pd.DataFrame.from_records([dictValue]))
-        df.reset_index(inplace=True)
+        df = pd.concat([df, pd.DataFrame.from_records([dictValue])], ignore_index=True)
+    df.reset_index(inplace=True)
         
     total_profit = budget - 1000
     print(f"Total profit: {total_profit}")
@@ -80,7 +80,7 @@ def printCumStatus(dataframe, report, epoch):
     fig.savefig(reportDir.format(ver=VERSION) + f"CS-{report}-EPC-{epoch}.png")
 
 def saveDataframe(dataframe, report, epoch):
-    dataframe.save_csv(reportPath.format(ver=VERSION, report = report, epoch = epoch))
+    dataframe.to_csv(reportPath.format(ver=VERSION, report = report, epoch = epoch))
 
 if __name__ == "__main__":
     testClass = Test()
