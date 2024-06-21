@@ -1,0 +1,5 @@
+﻿VERSION,COMVER,batch_size,gamma,epsilon,epsilon_min,annelingSteps
+3,1,32,0.95,1,0.1,16000
+4,1,16,0.95,1,0.1,16000
+5,1,8,0.95,1,0.1, 16000
+6,1,4,0.95,1,0.1, 16000

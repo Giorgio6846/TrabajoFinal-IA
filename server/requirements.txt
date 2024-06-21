@@ -1,2 +1,4 @@
-zmq
-nx
+pyzmq
+networkx
+ultralytics
+opencv-python

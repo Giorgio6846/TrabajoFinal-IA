@@ -1,0 +1,8 @@
+VERSION: 5 
+COMVER: 1 
+batch_size: 8 
+gamma: 0.95 
+epsilon: 1 
+epsilon_min: 0.1 
+annelingSteps: 16000 
+layers: 256 

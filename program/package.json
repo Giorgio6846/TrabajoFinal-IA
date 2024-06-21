@@ -75,7 +75,8 @@
     "undici-types": "^5.26.5",
     "universalify": "^0.1.2",
     "wrappy": "^1.0.2",
-    "yauzl": "^2.10.0"
+    "yauzl": "^2.10.0",
+    "zeromq": "^6.0.0-beta.19"
   },
   "author": "Matt",
   "license": "ISC"
