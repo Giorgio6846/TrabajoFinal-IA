@@ -26,6 +26,13 @@
             "console": "integratedTerminal"
         },
         {
+            "name": "Debug Server",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/server/server.py",
+            "console": "integratedTerminal"
+        },
+        {
             "name": "Debug Main Process",
             "type": "node",
             "request": "launch",

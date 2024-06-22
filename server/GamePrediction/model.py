@@ -1,15 +1,19 @@
 import tensorflow as tf
-import tensorflow.keras as models
+from tensorflow.keras import models
 import numpy as np
 
 # Solo soporta archivos .keras
 # Solo funciona en maquinas unix
-model = models.load_model("./finished_1.keras")
+model = models.load_model("./server/GamePrediction/finished_1.keras")
 typesCards = ["S", "D", "C", "H"]
 
+MIN_PRED = 0.4
 
 def translateArray(cards):
     array = np.zeros(13)
+
+    if cards == None:
+        return 0
 
     for card in cards:
         print(card["TypeCard"])
@@ -19,6 +23,8 @@ def translateArray(cards):
 
     print(array)
     return array
+
+typesCards = ["S", "D", "C", "H"]
 
 def categoryCard(card):
     if typesCards[0] in card:
@@ -68,34 +74,41 @@ def countCards(arrayCards):
     if ace and count < 11:
         count = count + 11
 
-    return count - 1
+    return count
 
 def parseCards(setCards):
     cardsParsed = []
-    
+
     for card in setCards:
         toParse = True
-        
+
         if len(cardsParsed) == 0:
             toParse = True
-                
+
         else:
             for cardP in cardsParsed:
                 if cardP["TypeCard"] == card["TypeCard"]:
                     toParse = False 
                     if card["Conf"] > cardP["Conf"]:
                         cardP["Conf"] = card["Conf"]
-            
+
+        if card["Conf"] <= MIN_PRED:
+            toParse = False
+
         if toParse:    
             cardsParsed.append(card) 
-        
-        return cardsParsed
-           
-    print(cardsParsed)
 
-def gamePrediction(cardsDealerBoxes, cardsPlayerBoxes):
-    state = states(cardsDealerBoxes, cardsPlayerBoxes)
+    return cardsParsed
 
+def has_double(arrayPlayer):
+    for index in range(13):
+        if arrayPlayer[index] == 2:
+            return 1
+
+    return 0
+
+
+def gamePrediction(state):   
     return np.argmax(
         model.predict(state, verbose=1, use_multiprocessing=True)[0]
     )
@@ -107,42 +120,37 @@ def states(cardsDealerBoxes, cardsPlayerBoxes):
     arrayPlayer = translateArray(playerParsed)
     arrayDealer = translateArray(dealerParsed)
 
-    sumCardsDealer = countCards(arrayDealer)
     sumCardsPlayer = countCards(arrayPlayer)
+    sumCardsDealer = countCards(arrayDealer)
 
     prob_21 = get_prob_of_bust(sumCardsPlayer)
 
-    #Actualmente se va a asumir que no se puede selecionar double
+    has_ace = usable_ace(arrayPlayer,sumCardsPlayer)
+
+    # Actualmente se va a asumir que no se puede selecionar double
     game_state = 0
-    pos_double = pos_double(arrayPlayer)
-    
+    pos_double = has_double(arrayPlayer)
+
     state = np.array(
-            [
-                sumCardsPlayer,
-                sumCardsDealer,
-                usable_ace,
-                pos_double,
-                prob_21,
-                game_state,
-            ]
-        )
+        [
+            sumCardsPlayer,
+            sumCardsDealer,
+            has_ace,
+            pos_double,
+            prob_21,
+            game_state,
+        ]
+    )
 
     state = state.astype(np.uint8)
     state = np.reshape(state, [1, 6])
-    
+
     return state
 
 def usable_ace(arrayPlayer, sumCardsPlayer):
     if sumCardsPlayer + 10 <= 21 and arrayPlayer[0] > 0:
         return True
     return False
-
-def pos_double(arrayPlayer):
-    for index in range(13):
-        if arrayPlayer[index] == 2:
-            return 1
-        
-    return 0
 
 def get_prob_of_bust(sumCards):
     value_needed = 21 - sumCards

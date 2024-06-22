@@ -1,10 +1,10 @@
 from ultralytics import YOLO
 
-model = YOLO("./last.pt")
+model = YOLO("./server/CardDetection/last.pt")
 
 def detectCards(path):
     results = model([path])
-    print(results)
+    #print(results)
 
     for result in results:
         boxes = result.boxes
