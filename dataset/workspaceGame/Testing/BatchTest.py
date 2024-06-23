@@ -11,7 +11,7 @@ from Testing import Test
 # It requires to have a model finished
 
 # Insert version number
-VERSION = 6
+VERSION = 10
 
 # It tests the model every x amount
 TESTEVERY = 2
