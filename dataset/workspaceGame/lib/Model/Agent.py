@@ -55,24 +55,24 @@ class DQNAgent:
     def getHyperparameters(self):
         return dict(
             {
-                "batch_size": self.batch_size,
+                "batchSize": self.batch_size,
                 "gamma": self.gamma,
                 "epsilon": self.epsilon,
-                "epsilon_min": self.epsilon_min,
+                "epsilonMin": self.epsilon_min,
                 "annelingSteps": self.annelingSteps,
-                "learningRate": self.learning_rate
+                "learningRate": self.learning_rate,
             }
         )
 
     def setHyperparameters(self, dictHyper):
-        self.batch_size = dictHyper["batch_size"]
+        self.batch_size = dictHyper["batchSize"]
         self.gamma = dictHyper["gamma"]
         self.epsilon = dictHyper["epsilon"]
-        self.epsilon_min = dictHyper["epsilon_min"]
+        self.epsilon_min = dictHyper["epsilonMin"]
         self.annelingSteps = dictHyper["annelingSteps"]
         self.learningRate = dictHyper["learningRate"]
 
-        #Sets a new model with the diferent learning_rate
+        # Sets a new model with the diferent learning_rate
         self.ModelClass = ModelDQN(
             self.state_size, self.action_size, self.learning_rate
         )

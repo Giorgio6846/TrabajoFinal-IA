@@ -1,1 +1,2 @@
-﻿VERSION,COMVER,batch_size,gamma,epsilon,epsilon_min,annelingSteps
+﻿Column1,Column2,Column3,Column4,Column5,Column6,Column7,Column8
+VERSION,COMVER,batchSize,gamma,epsilon,epsilonMin,annelingSteps,LearningRate
