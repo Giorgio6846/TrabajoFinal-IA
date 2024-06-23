@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-from Testing import Test
+from SingleTesting import Test
 
 # Based on a model version it loads the starting epochs of each file
 # It requires to have a model finished
