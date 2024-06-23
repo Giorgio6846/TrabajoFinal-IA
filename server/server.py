@@ -5,8 +5,8 @@ from sympy import proper_divisor_count
 import zmq
 import json
 
-import server.CardDetection.model as cardModel
-import server.GamePrediction.model as gameModel
+import CardDetection.model as cardModel
+import GamePrediction.model as gameModel
 
 context = zmq.Context()
 socket = context.socket(zmq.REP)

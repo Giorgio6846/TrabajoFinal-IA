@@ -1,6 +1,6 @@
 from ultralytics import YOLO
 
-model = YOLO("./last.pt")
+model = YOLO("./CardDetection/last.pt")
 
 def detectCards(path):
     results = model([path])
