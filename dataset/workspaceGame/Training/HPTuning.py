@@ -3,15 +3,11 @@ import os
 import numpy as np 
 import sys
 from sklearn.model_selection import ParameterSampler
-from multiprocessing import Manager, Process
 from scipy.stats import uniform
-from sympy import evaluate
-
-from dataset.workspaceGame.Testing.BatchTest import TestModel
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-from Testing.SingleTesting import Test, TestClass
+from Testing.SingleTesting import Test
 from lib.Model.Agent import DQNAgent
 from lib.Game.Environment import BJEnvironment
 
@@ -21,9 +17,11 @@ TESTGAMES = 1000
 df = pd.DataFrame()
 
 if("TERM_PROGRAM" in os.environ.keys() and os.environ["TERM_PROGRAM"] == "vscode"):
-    BatchesQueue = pd.read_csv("dataset/workspaceGame/Training/testModels.csv")
+    path = "dataset/workspaceGame/Training/testModels.csv"
 else:
-    BatchesQueue = pd.read_csv("./testModels.csv")
+    path = "./testModels.csv"
+
+BatchesQueue = pd.read_csv(path)
 
 hyperparameter_space = {
     "batchSize":     np.arange(8   ,33   ,8),
@@ -133,7 +131,7 @@ def train_evaluate_report(parameter, df):
 
     agent.setHyperparameters(parameter)
 
-    parameter["VERSION"] = len(df.shape[0]+1)
+    parameter["VERSION"] = len(df) + 1
     parameter["COMVER"] = 1
 
     if isIndf(df, parameter):
@@ -169,7 +167,7 @@ def train_evaluate_report(parameter, df):
         version = dfLatestVersion(df)
         train(parameter["annelingSteps"], agent,env, version, 1)
 
-        mean = evaluateCheckpoints(version, latestVer)
+        mean = evaluateCheckpoints(version, 1)
 
     parameter["mean"] = mean
     
@@ -181,51 +179,69 @@ def getMeanPercentage(df):
 
 # Loads the finished model to get the mean wins and fails
 def evaluateCheckpoints(version, comver):
-    dfArray = []
-    testClass = Test()
+    meanArray = []
+    
+    for _ in range(3):
+        dfArray = []
+        testClass = Test()
 
-    epochs = testClass.ModelClass.getCheckpointLatestVersion(version, comver)
+        epochs = testClass.ModelClass.getCheckpointLatestVersion(version, comver)
 
-    for epoch in range(1, epochs):
-        testClass.ModelClass.loadCheckpoint(version, comver, epoch)
+        for epoch in range(1, epochs):
+            testClass.ModelClass.loadCheckpoint(version, comver, epoch)
+            dfArray.append(TestModel(testClass))
+
+        testClass.ModelClass.loadModel(version, comver)
         dfArray.append(TestModel(testClass))
 
-    testClass.ModelClass.loadModel(version, comver)
-    dfArray.append(TestModel(testClass))
+        df = summaryDataframes(dfArray)
+        
+        mean = getMeanPercentage(df)
+        meanArray.append(mean)
 
-    df = summaryDataframes(dfArray)
+    npArr = np.array(meanArray)
+    mean = round(npArr.mean(),2)
     
-    mean = getMeanPercentage(df)
     return mean
 
 # Loads the finished model to get the mean wins and fails
 def evaluateModel(version, comver):
-    dfArray = []
+    meanArray = []
     
-    testClass = Test()
-    testClass.ModelClass.loadModel(version, comver)
+    for _ in range(3):
+        dfArray = []
+        
+        testClass = Test()
+        testClass.ModelClass.loadModel(version, comver)
 
-    dfArray.append(TestModel(testClass))
-    df = summaryDataframes(dfArray)
+        dfArray.append(TestModel(testClass))
+        df = summaryDataframes(dfArray)
 
-    mean = getMeanPercentage(df)
+        mean = getMeanPercentage(df)
+        meanArray.append(mean)
+        
+    npArr = np.array(meanArray)
+    mean = round(npArr.mean(),2)
+        
     return mean
 
 def train(episodes, agent, env, version, comver):
     epoch = 1
     
     for ep in range(episodes + 1):
-         agent.train(env, False)
+        print(ep)        
+        agent.train(env, False)
          
-         if ep % 250 == 0 and ep != 0:
-             agent.ModelClass.saveCheckpoint(version, comver, epoch)
-             epoch + 1
-    
+        if ep % 250 == 0 and ep != 0:
+            agent.ModelClass.saveCheckpoint(version, comver, epoch)
+            epoch = epoch + 1
+
     agent.ModelClass.saveModel(version, comver)
 
 if __name__ == "__main__":
     parameter_list = list(ParameterSampler(hyperparameter_space, n_iter = 50))
 
     for parameter in parameter_list:
-        inf = train_evaluate_report(parameter, df)
+        inf = train_evaluate_report(parameter, BatchesQueue)
         df = pd.concat([df, pd.DataFrame.from_records([inf])], ignore_index=True)
+        df.to_csv(path)

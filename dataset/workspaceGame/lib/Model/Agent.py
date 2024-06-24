@@ -36,7 +36,7 @@ class DQNAgent:
 
         # DQN Config
         self.memory = deque(maxlen=10000)  # Aquí se define la memoria de repetición
-        self.ModelClass = ModelDQN(self.state_size, self.action_size, self.learning_rate)
+        self.ModelClass = ModelDQN(self.state_size, self.action_size, self.learningRate)
 
         # Save Config
         self.version = VERSION
@@ -60,7 +60,7 @@ class DQNAgent:
                 "epsilon": self.epsilon,
                 "epsilonMin": self.epsilon_min,
                 "annelingSteps": self.annelingSteps,
-                "learningRate": self.learning_rate,
+                "learningRate": self.learningRate,
             }
         )
 
@@ -74,7 +74,7 @@ class DQNAgent:
 
         # Sets a new model with the diferent learning_rate
         self.ModelClass = ModelDQN(
-            self.state_size, self.action_size, self.learning_rate
+            self.state_size, self.action_size, self.learningRate
         )
         self.calcStepDrop()
 

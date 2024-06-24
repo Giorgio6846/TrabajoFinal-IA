@@ -101,7 +101,7 @@ class BJEnvironment(gym.Env):
         prob_21 = self.game.get_prob_of_bust(self.used_carts)
         game_state = self.game.status
 
-        if game_state == 1 and player_sum > 21:
+        if game_state == 2 and player_sum > 21:
             player_sum = self.game.hand_value(self.game.splitted_hands[1])
 
         state = np.array(

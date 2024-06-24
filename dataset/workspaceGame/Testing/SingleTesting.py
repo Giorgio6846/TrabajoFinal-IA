@@ -14,7 +14,7 @@ EPOCH = 33
 class Test:
     def __init__(self):
         self.env = BJEnvironment()
-        self.ModelClass = ModelDQN(self.env.state_size,self.env.action_size)
+        self.ModelClass = ModelDQN(self.env.state_size,self.env.action_size, 0.1)
 
         self.state_size = 3
 
