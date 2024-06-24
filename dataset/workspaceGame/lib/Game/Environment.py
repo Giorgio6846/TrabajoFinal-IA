@@ -10,11 +10,12 @@ class BJEnvironment(gym.Env):
         self.deck_min_len = 109
 
         # player_sum, dealer_sum, usable_ace, has_double, prob_21, game_state
-        # game_state = 0 normal, 1 split, 2 double
+        # game_state = 0 normal, 1 double
+        # 2 split. Not available in this version
         self.state_size = 6
-        # Hit, Stand, Split, Double
-        self.action_size = 2
-        self.observation_space = spaces.Box(low=np.array([4,4,0,0,0,0]), high=np.array([30,30,1,1,9,2]), shape=(self.state_size,), dtype=np.uint8)
+        # Hit, Stand, Double, Split
+        self.action_size = 3
+        self.observation_space = spaces.Box(low=np.array([4,2,0,0,0,0]), high=np.array([30,26,1,1,10,1]), shape=(self.state_size,), dtype=np.uint8)
         self.action_space = spaces.Discrete(self.action_size)
 
     @staticmethod
@@ -40,7 +41,7 @@ class BJEnvironment(gym.Env):
         return final_result
 
     def step(self, action):
-        act_string = ["hit", "stay", "split", "double"][action]
+        act_string = ["hit", "stay", "double", "split"][action]
         state = self.get_obs()
         bet = self.game.bet_game
         status = self.game.player_action(act_string)
@@ -92,15 +93,15 @@ class BJEnvironment(gym.Env):
         if self.game.firstTurn:
             dealer_card = self.game.hand_value(self.game.dealer_hand[:1])
         usable_ace = self.has_usable_ace(self.game.player_hand)
-        #has_split = (
+        # has_split = (
         #    len(self.game.player_hand) == 2
         #    and self.game.player_hand[0]["number"] == self.game.player_hand[1]["number"]
-        #)
+        # )
         has_double = self.game.firstTurn
         prob_21 = self.game.get_prob_of_bust(self.used_carts)
         game_state = self.game.status
 
-        if game_state == 1 and player_sum > 21:
+        if game_state == 2 and player_sum > 21:
             player_sum = self.game.hand_value(self.game.splitted_hands[1])
 
         state = np.array(
@@ -121,7 +122,7 @@ class BJEnvironment(gym.Env):
     def reset(self, bet):
 
         self.bet = bet
-        
+
         if(len(self.game.get_deck()) == 312):
             self.set_deck_per_game(self.game.get_deck())
 

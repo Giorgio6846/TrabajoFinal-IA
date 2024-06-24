@@ -92,7 +92,7 @@ class BlackjackGame:
         elif action == "double":
             self.bet_game *= 2
             self.player_hand.append(self.deal_card())
-            self.status = 2
+            self.status = 1
             self.game_status[0] = "stay"
         # "Split" divide la mano del jugador en 2, doblando la apuesta (solo aplica cuando la mano del jugador cuenta con 2 cartas del mismo numero)
         elif action == "split":
@@ -107,7 +107,7 @@ class BlackjackGame:
                 self.splitted_hands[0].append(self.deal_card())
                 self.splitted_hands[1].append(self.deal_card())
                 self.bet_game *= 2
-                self.status = 1
+                self.status = 2
 
             else:
                 print("El split solo es permitido con 2 cartas del mismo valor en la mano")
@@ -257,13 +257,15 @@ class BlackjackGame:
         # probability_of_bust = (busting_cards / total_cards) * 100
         # probability_of_bust = probability_of_bust/10
 
-        probability_of_bust = abs(100 * value_needed / 21)
+        probability_of_bust = 100 * value_needed / 21
+        
+        if probability_of_bust < 0:
+            probability_of_bust = 0
+                   
         probability_of_bust = probability_of_bust / 10
 
         probability_of_bust = round(probability_of_bust)
-    
-        if probability_of_bust > 10:
-            probability_of_bust = 0        
+        probability_of_bust = abs(probability_of_bust)
 
         return int(probability_of_bust)
 

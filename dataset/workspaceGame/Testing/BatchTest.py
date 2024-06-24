@@ -5,16 +5,16 @@ import matplotlib.pyplot as plt
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-from Testing import Test
+from SingleTesting import Test
 
 # Based on a model version it loads the starting epochs of each file
 # It requires to have a model finished
 
 # Insert version number
-VERSION = 5
+VERSION = 10
 
 # It tests the model every x amount
-TESTEVERY = 5
+TESTEVERY = 2
 
 # Configurations
 TESTGAMES = 1000
@@ -94,7 +94,7 @@ if __name__ == "__main__":
 
         Epoch = 1
         for epoch in range(1, epochs):
-            if epoch == 1 or epoch % 5 == 0:
+            if epoch == 1 or epoch % TESTEVERY == 0:
                 testClass.ModelClass.loadCheckpoint(VERSION, completedVersion, epoch)
 
                 dfGameStatus = TestModel(testClass)
