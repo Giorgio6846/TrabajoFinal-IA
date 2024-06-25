@@ -14,22 +14,19 @@ from lib.Game.Environment import BJEnvironment
 SAVEEVERY = 250
 TESTGAMES = 1000
 
-df = pd.DataFrame()
-
 if("TERM_PROGRAM" in os.environ.keys() and os.environ["TERM_PROGRAM"] == "vscode"):
     path = "dataset/workspaceGame/Training/testModels.csv"
 else:
     path = "./testModels.csv"
 
-BatchesQueue = pd.read_csv(path)
-
 hyperparameter_space = {
-    "batchSize":     np.arange(8   ,33   ,8),
-    "gamma":         np.arange(80 ,100 ,1)/100,
-    "epsilon":       np.arange(80 ,100 ,1)/100,
-    "epsilonMin":    np.arange(10 ,21  ,1)/100,
-    "annelingSteps": np.arange(6000,16001,500),
-    "learningRate":  uniform(1e-5, 1e-2),
+    "batchSize": np.arange(8, 33, 8),
+    "gamma": np.arange(80, 100, 1) / 100,
+    "epsilon": np.arange(80, 100, 1) / 100,
+    "epsilonMin": np.arange(10, 21, 1) / 100,
+    "annelingSteps": np.arange(6000, 16001, 500),
+    # "annelingSteps": np.arange(500,501,500),
+    "learningRate": np.arange(1, 20, 1) / 100,
 }
 
 def summaryDataframes(arrayDataframe):
@@ -42,6 +39,7 @@ def summaryDataframes(arrayDataframe):
             "loss": (dataframe["status"] == "loss").sum(),
             "win": (dataframe["status"] == "win").sum(),
             "draw": (dataframe["status"] == "draw").sum(),
+            "win_double": (dataframe["status"] == "win_double").sum()
         }
         chkpnt = chkpnt + 1
         df = pd.concat([df, pd.DataFrame.from_records([dictValue])], ignore_index=True)
@@ -131,8 +129,13 @@ def train_evaluate_report(parameter, df):
 
     agent.setHyperparameters(parameter)
 
+    print(df)
+    print(len(df))
+
     parameter["VERSION"] = len(df) + 1
     parameter["COMVER"] = 1
+
+    print(parameter)
 
     if isIndf(df, parameter):
         annelingSteps, version, comver = getAnnelingStepsFromDF(df, parameter)
@@ -165,9 +168,9 @@ def train_evaluate_report(parameter, df):
             mean = evaluateCheckpoints(version, latestVer)
     else: 
         version = dfLatestVersion(df)
-        train(parameter["annelingSteps"], agent,env, version, 1)
+        train(parameter["annelingSteps"], agent,env, parameter["VERSION"], 1)
 
-        mean = evaluateCheckpoints(version, 1)
+        mean = evaluateCheckpoints(parameter["VERSION"], 1)
 
     parameter["mean"] = mean
     
@@ -242,6 +245,8 @@ if __name__ == "__main__":
     parameter_list = list(ParameterSampler(hyperparameter_space, n_iter = 50))
 
     for parameter in parameter_list:
-        inf = train_evaluate_report(parameter, BatchesQueue)
+        df = pd.read_csv(path)
+        inf = train_evaluate_report(parameter, df)
+        print(inf)
         df = pd.concat([df, pd.DataFrame.from_records([inf])], ignore_index=True)
         df.to_csv(path)
