@@ -31,6 +31,7 @@ if __name__ == "__main__":
         agent.setHyperparameters(batch)
         batch["layers"] = LAYERS
         agent.ModelClass.saveConfigModel(batch, batch["VERSION"])
+        
 
         batch["COMVER"] = agent.ModelClass.getFinalLatestVersion(batch["VERSION"])
         print(batch["COMVER"])
