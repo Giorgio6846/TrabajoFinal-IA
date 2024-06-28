@@ -19,12 +19,17 @@ if("TERM_PROGRAM" in os.environ.keys() and os.environ["TERM_PROGRAM"] == "vscode
 else:
     path = "./testModels.csv"
 
+#Cambios:
+#Epsilon 80 a 85
+#Anneling steps 16001 a 15001
+#EpsilonMin de 21 a 16
+
 hyperparameter_space = {
     "batchSize": np.arange(8, 33, 8),
     "gamma": np.arange(80, 100, 1) / 100,
-    "epsilon": np.arange(80, 100, 1) / 100,
-    "epsilonMin": np.arange(10, 21, 1) / 100,
-    "annelingSteps": np.arange(6000, 16001, 500),
+    "epsilon": np.arange(85, 100, 1) / 100,
+    "epsilonMin": np.arange(10, 16, 1) / 100,
+    "annelingSteps": np.arange(6000, 15001, 500),
     # "annelingSteps": np.arange(500,501,500),
     "learningRate": np.arange(1, 20, 1) / 100,
 }
@@ -249,4 +254,4 @@ if __name__ == "__main__":
         inf = train_evaluate_report(parameter, df)
         print(inf)
         df = pd.concat([df, pd.DataFrame.from_records([inf])], ignore_index=True)
-        df.to_csv(path)
+        df.to_csv(path, index = False)

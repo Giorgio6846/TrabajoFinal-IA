@@ -1,7 +1,5 @@
 import os
 import base64
-import time
-from sympy import proper_divisor_count
 import zmq
 import json
 

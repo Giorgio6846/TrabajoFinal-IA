@@ -4,7 +4,7 @@ import numpy as np
 
 # Solo soporta archivos .keras
 # Solo funciona en maquinas unix
-model = models.load_model("./server/GamePrediction/finished_1.keras")
+model = models.load_model("./GamePrediction/finished_1.keras")
 typesCards = ["S", "D", "C", "H"]
 
 MIN_PRED = 0.4
@@ -37,7 +37,8 @@ def categoryCard(card):
         return 3
 
 def valueCard(card, cat):
-    value = card[0].split(typesCards[cat])[0]
+    typeCard = typesCards[cat]
+    value = card.split(typeCard)[0]
     if value == "A":
         return 1
     elif value == "J":
@@ -72,7 +73,7 @@ def countCards(arrayCards):
                 count = count + arrayTMP[index] * (index + 1)
 
     if ace and count < 11:
-        count = count + 11
+        count = count + 10
 
     return count
 
