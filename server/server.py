@@ -52,7 +52,7 @@ class Server:
         prediction = gameModel.gamePrediction(state)
         print(state, prediction)
 
-        predictionArray = ["hit", "stay", "split", "double"][prediction]
+        predictionArray = ["hit", "stay", "double", "split"][prediction]
         print(predictionArray)
         return state, predictionArray
 
