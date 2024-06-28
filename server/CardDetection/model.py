@@ -1,10 +1,23 @@
 from ultralytics import YOLO
+import cv2
 
-model = YOLO("./server/CardDetection/last.pt")
+model = YOLO("./CardDetection/last.pt")
+
+def imageChanges(path):
+    img = cv2.imread(path)
+    img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    
+    output_path = path + "GS.png"
+    
+    cv2.imwrite(output_path, img_gray)
+    return output_path
 
 def detectCards(path):
-    results = model([path])
-    #print(results)
+    # Para la mejorar la deteccion de las imagenes
+    grayPath = imageChanges(path)
+
+    results = model([grayPath])
+    # print(results)
 
     for result in results:
         boxes = result.boxes
@@ -17,7 +30,7 @@ def detectCards(path):
 
     cardsDealer, cardsPlayer = parseBoxes(boxes, names)
     return cardsDealer, cardsPlayer
-    
+
 def parseBoxes(boxes, names):
     cards = []
 
