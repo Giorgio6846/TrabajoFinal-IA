@@ -130,7 +130,7 @@ def states(cardsDealerBoxes, cardsPlayerBoxes):
 
     # Actualmente se va a asumir que no se puede selecionar double
     game_state = 0
-    pos_double = has_double(arrayPlayer)
+    pos_double = 0
 
     state = np.array(
         [

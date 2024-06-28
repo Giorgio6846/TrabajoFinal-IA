@@ -73,7 +73,7 @@ def parseBoxes(boxes, names):
         X2 = Coordinates[2]
         Y2 = Coordinates[3]
 
-        if Y1 > orig_shapeX / 2 or Y2 > orig_shapeX / 2:
+        if Y1 < orig_shapeX / 2 or Y2 < orig_shapeX / 2:
             cardsDealer.append(card)
         else:
             cardsPlayer.append(card)
