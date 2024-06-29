@@ -1,15 +1,10 @@
-dataset/workspaceCards/centernet_hg104_512x512_coco17_tpu-8.tar.gz8xwo_wp_.tmp
-/dataset/workspaceCards/.ipynb_checkpoints
-dataset/workspaceCards/models/
-/dataset/workspaceCards/BCC.v1-bccd.coco
-/dataset/workspaceCards/bccd_coco_tfrecords
-/dataset/workspaceCards/trained_model
-/dataset/workspaceCards/trainModel
-/dataset/workspaceCards/PlayingCards.v4-yolov8n.coco
-dataset/workspaceCards/tfRecords/test-00000-of-00001.tfrecord
-dataset/workspaceCards/tfRecords/train-00000-of-00001.tfrecord
-dataset/workspaceCards/tfRecords/valid-00000-of-00001.tfrecord
-dataset/workspaceCards/Playing Cards.v4-yolov8n.coco.zip
-/dataset/workspaceCards/PlayingCards.v4-yolov8n.coco
-/program/node_modules
-/dataset/.Trash-0
+**/__pycache__
+**/node_modules
+**/.ipynb_checkpoints
+**/__pycache__
+**/logs
+__pycache__/*.pyc[od]
+**/.DS_Store
+*.DS_Store
+*.env
+*.conda

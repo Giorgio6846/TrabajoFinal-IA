@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Proyecto Inteligencia Artificial</title>
+    <link rel="stylesheet" type="text/css" href="../styles/form.css" />
+  </head>
+
+  <body>
+    <h1>Proyecto Inteligencia Artificial</h1>
+    <section class="form">
+      <form action="./mainPage" method="post">
+        <label for="fname">Nombre:</label>
+        <input type="text" id="fname" name="fname" required />
+
+        <label for="age">Edad:</label>
+        <input type="number" id="age" name="age" required />
+
+        <label for="income">Ingresos:</label>
+        <input type="number" id="income" name="income" required />
+
+        <label for="gender">Genero:</label>
+        <select id="gender" name="gender" required>
+          <option value="">Seleccionar...</option>
+          <option value="male">Male</option>
+          <option value="female">Female</option>
+        </select>
+
+        <label for="cStatus">Estado civil:</label>
+        <select id="cStatus" name="cStatus" required>
+          <option value="">Seleccionar...</option>
+          <option value="solter@">Soltero/a</option>
+          <option value="casad@">Casado/a</option>
+          <option value="divorciad@">Divociardo/a</option>
+        </select>
+
+        <label for="education">Nivel educativo:</label>
+        <select id="education" name="education" required>
+          <option value="">Seleccionar...</option>
+          <option value="primary">Primaria</option>
+          <option value="secondary">Secundaria</option>
+          <option value="university">Universidad</option>
+        </select>
+
+        <input type="submit" class="startProgram" value="Iniciar programa" />
+      </form>
+      <button id="toggleScreenshotBtn">Toggle Screenshot</button>
+      <p id="screenshotStatus"></p>
+    </section>
+    <script src="../scripts/manageScreenshot.js"></script>
+    <script src="../scripts/controlScreenshot.js"></script>
+    <script src="../scripts/mouseDetector.js"></script>
+    <script src="../scripts/manageScreenshot.js"></script>
+  </body>
+</html>

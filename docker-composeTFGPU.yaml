@@ -11,6 +11,7 @@ services:
       - '8888:8888'
     volumes: 
       - .\dataset:/tf/dataset:dataset
+      - .\program:/tf/program:app
     deploy:
       resources:
         reservations:

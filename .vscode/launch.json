@@ -5,6 +5,34 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Debug SingleTraining",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/dataset/workspaceGame/Training/SingleTraining.py",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Debug WorkerPC",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/dataset/workspaceGame/Training/WorkerPC.py",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Debug A3CSingleTraining",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/dataset/workspaceGame/Training/A3CSingleTraining.py",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Debug Server",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/server/server.py",
+            "console": "integratedTerminal"
+        },
+        {
             "name": "Debug Main Process",
             "type": "node",
             "request": "launch",
