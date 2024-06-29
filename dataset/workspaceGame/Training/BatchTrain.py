@@ -8,7 +8,7 @@ from lib.Model.Agent import DQNAgent
 from lib.Game.Environment import BJEnvironment
 from lib.Model.Tools import LAYERS
 
-#Based on a csv file it trains the model with the hyperparameters set on the csv file
+# Based on a csv file it trains the model with the hyperparameters set on the csv file
 
 SAVEEVERY = 250
 
@@ -18,10 +18,10 @@ EPISODES = 10000
 if __name__ == "__main__":
 
     if("TERM_PROGRAM" in os.environ.keys() and os.environ["TERM_PROGRAM"] == "vscode"):
-        BatchesQueue = pd.read_csv("dataset/workspaceGame/Training/testModels.csv")
+        BatchesQueue = pd.read_csv("dataset/workspaceGame/Training/trainModel.csv")
     else:
-        BatchesQueue = pd.read_csv("./testModels.csv")
-        
+        BatchesQueue = pd.read_csv("./trainModel.csv")
+
     BatchesDict = BatchesQueue.to_dict(orient='records')
 
     for batch in BatchesDict:
@@ -31,7 +31,6 @@ if __name__ == "__main__":
         agent.setHyperparameters(batch)
         batch["layers"] = LAYERS
         agent.ModelClass.saveConfigModel(batch, batch["VERSION"])
-        
 
         batch["COMVER"] = agent.ModelClass.getFinalLatestVersion(batch["VERSION"])
         print(batch["COMVER"])

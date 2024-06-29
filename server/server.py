@@ -1,7 +1,5 @@
 import os
 import base64
-import time
-from sympy import proper_divisor_count
 import zmq
 import json
 
@@ -54,7 +52,7 @@ class Server:
         prediction = gameModel.gamePrediction(state)
         print(state, prediction)
 
-        predictionArray = ["hit", "stay", "split", "double"][prediction]
+        predictionArray = ["hit", "stay", "double", "split"][prediction]
         print(predictionArray)
         return state, predictionArray
 

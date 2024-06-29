@@ -38,7 +38,8 @@ def categoryCard(card):
         return 3
 
 def valueCard(card, cat):
-    value = card[0].split(typesCards[cat])[0]
+    typeCard = typesCards[cat]
+    value = card.split(typeCard)[0]
     if value == "A":
         return 1
     elif value == "J":
@@ -73,7 +74,7 @@ def countCards(arrayCards):
                 count = count + arrayTMP[index] * (index + 1)
 
     if ace and count < 11:
-        count = count + 11
+        count = count + 10
 
     return count
 
@@ -130,7 +131,7 @@ def states(cardsDealerBoxes, cardsPlayerBoxes):
 
     # Actualmente se va a asumir que no se puede selecionar double
     game_state = 0
-    pos_double = has_double(arrayPlayer)
+    pos_double = 0
 
     state = np.array(
         [
