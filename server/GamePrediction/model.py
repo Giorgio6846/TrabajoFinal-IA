@@ -5,6 +5,7 @@ import numpy as np
 # Solo soporta archivos .keras
 # Solo funciona en maquinas unix
 model = models.load_model("./GamePrediction/finished_1.keras")
+
 typesCards = ["S", "D", "C", "H"]
 
 MIN_PRED = 0.4
