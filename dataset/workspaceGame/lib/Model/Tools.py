@@ -117,6 +117,13 @@ class Tools:
             f.write(f"{key}: {value} \n")
         f.close()
 
+    def saveConfigModelComVer(self, dict, VERSION, comVer):
+        self.checkFolder(self.modelDir.format(ver=VERSION)+f"info{comVer}.txt")
+        f = open(self.modelDir.format(ver=VERSION) + f"info{comVer}.txt", "w")
+        for key, value in dict.items():
+            f.write(f"{key}: {value} \n")
+        f.close()
+
     def checkFolder(self, path):
         if not os.path.exists(os.path.dirname(path)):
             os.makedirs(os.path.dirname(path))
@@ -149,11 +156,12 @@ class ModelA3C(Tools):
         #self.model.summary()
 
 class ModelDQN(Tools):
-    def __init__(self, state_size, action_size):
+    def __init__(self, state_size, action_size, learning_rate):
         super().__init__()
 
         self.state_size = state_size
         self.action_size = action_size
+        self.learning_rate = learning_rate
         self._build_model()
 
     def _build_model(self):
@@ -163,9 +171,9 @@ class ModelDQN(Tools):
         self.model.add(layers.Dense(self.action_size, activation="linear"))
 
         if platform.system() == "Darwin" and platform.processor() == "arm":
-            opt = tf.keras.optimizers.legacy.Adam(learning_rate=0.01)
+            opt = tf.keras.optimizers.legacy.Adam(learning_rate=self.learning_rate)
         else:
-            opt = tf.keras.optimizers.Adam(learning_rate=0.01)
+            opt = tf.keras.optimizers.Adam(learning_rate=self.learning_rate)
 
         self.model.compile(loss="mse", optimizer=opt, metrics=["accuracy"])
         self.model.summary()
