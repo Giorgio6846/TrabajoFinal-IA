@@ -15,14 +15,9 @@ RUN pip install tf-models-official
 
 WORKDIR /tf/
 COPY ./requirements.txt /tf/
-COPY ./server/requirements.txt /tf/server/
 
-#Install the requirements of the server
-WORKDIR /tf/server
-RUN pip install -r requirements.txt
-
-WORKDIR /tf
 #Install the requirements of the workspaceGame
+WORKDIR /tf
 RUN pip install -r requirements.txt
 
 RUN jupyter notebook --generate-config --allow-root

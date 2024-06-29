@@ -2,3 +2,13 @@ tensorflow == 2.15
 gymnasium
 tf-keras == 2.15
 multiprocess
+
+seaborn
+
+pyzmq
+networkx
+ultralytics
+opencv-python
+roboflow
+
+scikit-learn
